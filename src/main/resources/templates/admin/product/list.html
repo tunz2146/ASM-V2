@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="vi" 
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title th:text="${pageTitle}">Danh sách sản phẩm</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        
+        <div class="bg-dark text-white py-4 mb-4">
+            <div class="container">
+                <h2 class="fw-bold mb-2">Cửa hàng</h2>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="/" class="text-white-50 text-decoration-none">Trang chủ</a></li>
+                        <li class="breadcrumb-item active text-danger" aria-current="page">Sản phẩm</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+
+        <div class="container pb-5">
+            <div class="row">
+                <div class="col-lg-3 mb-4">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-white py-3">
+                            <h5 class="mb-0 fw-bold">Danh mục</h5>
+                        </div>
+                        <div class="list-group list-group-flush">
+                            <a th:href="@{/products}" 
+                               class="list-group-item list-group-item-action"
+                               th:classappend="${currentCategory == null or currentCategory == ''} ? 'active bg-danger border-danger'">
+                               <i class="bi bi-grid-fill me-2"></i>Tất cả sản phẩm
+                            </a>
+                            
+                            <a th:each="cat : ${categories}"
+                               th:href="@{/products(category=${cat.slug})}"
+                               class="list-group-item list-group-item-action"
+                               th:classappend="${currentCategory == cat.slug} ? 'active bg-danger border-danger'">
+                               <i class="bi me-2" 
+                                  th:classappend="${cat.slug.contains('chuot') ? 'bi-mouse' : 
+                                                    (cat.slug.contains('phim') ? 'bi-keyboard' : 
+                                                    (cat.slug.contains('tai') ? 'bi-headphones' : 'bi-circle'))}"></i>
+                               <span th:text="${cat.ten}">Tên danh mục</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-9">
+                    <div class="d-flex justify-content-between align-items-center mb-4 bg-white p-3 rounded shadow-sm">
+                        <span class="text-muted">
+                            Hiển thị [[${products.numberOfElements}]] trên [[${products.totalElements}]] sản phẩm
+                        </span>
+                        
+                        <form action="/products" method="get" class="d-flex" style="max-width: 300px;">
+                            <input type="hidden" name="category" th:value="${currentCategory}" th:if="${currentCategory != null}">
+                            
+                            <input type="text" name="keyword" th:value="${keyword}" 
+                                   class="form-control form-control-sm me-2" placeholder="Tìm sản phẩm...">
+                            <button class="btn btn-danger btn-sm" type="submit"><i class="bi bi-search"></i></button>
+                        </form>
+                    </div>
+
+                    <div class="row g-4">
+                        <div th:each="p : ${products.content}" class="col-md-4 col-sm-6">
+                            <div class="product-card card h-100 border-0 shadow-sm">
+                                <div class="product-image position-relative">
+                                    <a th:href="@{'/products/' + ${p.slug}}">
+                                        <img th:src="${p.hinhAnh != null ? '/images/products/' + p.hinhAnh : 'https://via.placeholder.com/300'}" 
+                                             class="card-img-top" th:alt="${p.tenSanPham}">
+                                    </a>
+                                    
+                                    <span th:if="${p.chietKhau != null and p.chietKhau > 0}" 
+                                          class="badge bg-danger position-absolute top-0 end-0 m-2">
+                                        -[[${p.chietKhau}]]%
+                                    </span>
+                                </div>
+                                
+                                <div class="card-body">
+                                    <small class="text-muted" th:if="${p.hang != null}">
+                                        <i class="bi bi-tag-fill me-1"></i>[[${p.hang.tenHang}]] </small>
+                                    <h5 class="card-title mt-1 mb-2">
+                                        <a th:href="@{'/products/' + ${p.slug}}" 
+                                           class="text-decoration-none text-dark hover-danger">
+                                            [[${p.tenSanPham}]]
+                                        </a>
+                                    </h5>
+                                    
+                                    <div class="price-section">
+                                        <span th:if="${p.chietKhau != null and p.chietKhau > 0}">
+                                            <span class="fw-bold text-danger fs-5">[[${#numbers.formatInteger(p.giaSauGiam, 0, 'COMMA')}]]₫</span>
+                                            <span class="text-muted text-decoration-line-through small ms-2">[[${#numbers.formatInteger(p.giaSanPham, 0, 'COMMA')}]]₫</span>
+                                        </span>
+                                        <span th:unless="${p.chietKhau != null and p.chietKhau > 0}">
+                                            <span class="fw-bold text-danger fs-5">[[${#numbers.formatInteger(p.giaSanPham, 0, 'COMMA')}]]₫</span>
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <div class="card-footer bg-white border-0 pb-3">
+                                    <button class="btn btn-outline-danger w-100 btn-sm">
+                                        <i class="bi bi-cart-plus me-1"></i> Thêm vào giỏ
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div th:if="${products.empty}" class="alert alert-warning text-center mt-4">
+                        <i class="bi bi-exclamation-circle me-2"></i>
+                        Không tìm thấy sản phẩm nào trong danh mục này.
+                    </div>
+
+                    <div class="d-flex justify-content-center mt-5" th:if="${totalPages > 1}">
+                        <nav>
+                            <ul class="pagination">
+                                <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                                    <a class="page-link text-danger" 
+                                       th:href="@{/products(page=${currentPage - 1}, keyword=${keyword}, category=${currentCategory})}">
+                                       <i class="bi bi-chevron-left"></i>
+                                    </a>
+                                </li>
+                                
+                                <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                                    th:classappend="${currentPage == i} ? 'active'">
+                                    <a class="page-link" 
+                                       th:classappend="${currentPage == i} ? 'bg-danger border-danger text-white' : 'text-danger'"
+                                       th:href="@{/products(page=${i}, keyword=${keyword}, category=${currentCategory})}">
+                                       [[${i + 1}]]
+                                    </a>
+                                </li>
+                                
+                                <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                                    <a class="page-link text-danger" 
+                                       th:href="@{/products(page=${currentPage + 1}, keyword=${keyword}, category=${currentCategory})}">
+                                       <i class="bi bi-chevron-right"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

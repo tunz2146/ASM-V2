@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Quản lý sản phẩm</title>
+</head>
+<body>
+    <div layout:fragment="content" class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="text-danger fw-bold">QUẢN LÝ SẢN PHẨM</h2>
+            <a href="/admin/products/create" class="btn btn-success">
+                <i class="bi bi-plus-lg me-2"></i>Thêm mới
+            </a>
+        </div>
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-0">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Hình ảnh</th>
+                            <th>Tên sản phẩm</th>
+                            <th>Giá bán</th>
+                            <th>Kho</th>
+                            <th>Danh mục</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="p : ${products.content}">
+                            <td>#[[${p.id}]]</td>
+                            <td>
+                                <img th:src="${p.hinhAnh != null ? '/images/products/' + p.hinhAnh : 'https://via.placeholder.com/50'}" 
+                                     style="width: 50px; height: 50px; object-fit: cover;" class="rounded">
+                            </td>
+                            <td class="fw-bold">[[${p.tenSanPham}]]</td>
+                            <td class="text-danger">[[${#numbers.formatInteger(p.giaSanPham, 0, 'COMMA')}]]₫</td>
+                            <td>
+                                <span class="badge" 
+                                      th:classappend="${p.tonKho > 0 ? 'bg-success' : 'bg-secondary'}"
+                                      th:text="${p.tonKho > 0 ? 'Còn hàng' : 'Hết hàng'}">Status</span>
+                            </td>
+                            <td>
+                                <span th:each="cat : ${p.loaiSanPhams}" class="badge bg-info text-dark me-1">
+                                    [[${cat.ten}]]
+                                </span>
+                            </td>
+                            <td>
+                                <a th:href="@{'/admin/products/edit/' + ${p.id}}" class="btn btn-sm btn-primary me-2">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a th:href="@{'/admin/products/delete/' + ${p.id}}" 
+                                   class="btn btn-sm btn-danger"
+                                   onclick="return confirm('Bạn có chắc muốn xóa không?');">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="mt-3" th:if="${totalPages > 1}">
+            <nav>
+                <ul class="pagination justify-content-center">
+                    <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                        th:classappend="${currentPage == i} ? 'active'">
+                        <a class="page-link" th:href="@{/admin/products(page=${i})}">[[${i + 1}]]</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</body>
+</html>

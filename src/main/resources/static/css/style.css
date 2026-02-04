@@ -1,0 +1,509 @@
+/* ===================================
+   GAMING SHOP - CUSTOM STYLES
+   ================================== */
+
+/* ========== ROOT VARIABLES ========== */
+:root {
+    --primary-color: #dc3545;
+    --secondary-color: #6c757d;
+    --dark-bg: #0d1117;
+    --dark-bg-2: #161b22;
+    --gaming-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --gaming-gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --gaming-gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+/* ========== GLOBAL STYLES ========== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    overflow-x: hidden;
+    background-color: #f8f9fa;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+}
+
+/* ========== HEADER STYLES ========== */
+.top-bar {
+    font-size: 0.875rem;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.top-bar a:hover {
+    color: var(--primary-color) !important;
+}
+
+.gaming-header .bg-gaming {
+    background: var(--dark-bg);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+
+.gaming-logo {
+    font-size: 1.5rem;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+}
+
+.gaming-logo:hover {
+    transform: scale(1.05);
+}
+
+.gaming-icon {
+    animation: rotate-icon 3s linear infinite;
+}
+
+@keyframes rotate-icon {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(15deg); }
+}
+
+.logo-text {
+    background: linear-gradient(45deg, #fff, #dc3545);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Navigation Links */
+.navbar-nav .nav-link {
+    color: rgba(255,255,255,0.85);
+    font-weight: 500;
+    padding: 0.7rem 1rem;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.navbar-nav .nav-link:hover,
+.navbar-nav .nav-link.active {
+    color: var(--primary-color);
+}
+
+.navbar-nav .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: var(--primary-color);
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+
+.navbar-nav .nav-link:hover::after {
+    width: 80%;
+}
+
+/* Search Bar */
+.search-form {
+    min-width: 300px;
+}
+
+.search-input {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #fff;
+    border-radius: 20px 0 0 20px;
+}
+
+.search-input::placeholder {
+    color: rgba(255,255,255,0.5);
+}
+
+.search-input:focus {
+    background: rgba(255,255,255,0.15);
+    border-color: var(--primary-color);
+    color: #fff;
+    box-shadow: 0 0 0 0.2rem rgba(220,53,69,0.25);
+}
+
+.search-form .btn {
+    border-radius: 0 20px 20px 0;
+}
+
+/* Cart Badge */
+.cart-link {
+    position: relative;
+}
+
+.cart-badge {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    min-width: 18px;
+    height: 18px;
+    font-size: 0.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+/* Dropdown Menu */
+.dropdown-menu-dark {
+    background: var(--dark-bg-2);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.dropdown-item {
+    transition: all 0.3s ease;
+}
+
+.dropdown-item:hover {
+    background: rgba(220,53,69,0.2);
+    color: var(--primary-color);
+    padding-left: 1.5rem;
+}
+
+/* ========== HERO SECTION ========== */
+.hero-section {
+    background: var(--dark-bg);
+}
+
+.hero-slide {
+    min-height: 500px;
+    padding: 60px 0;
+}
+
+.bg-gradient-dark {
+    background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
+}
+
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+}
+
+.bg-gradient-success {
+    background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+}
+
+.min-vh-50 {
+    min-height: 50vh;
+}
+
+.gaming-title {
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    animation: fadeInUp 1s ease;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.gaming-icon-float {
+    animation: float 3s ease-in-out infinite;
+    font-size: 200px;
+    opacity: 0.8;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+/* Carousel Controls */
+.carousel-control-prev,
+.carousel-control-next {
+    width: 5%;
+    opacity: 0.7;
+}
+
+.carousel-control-prev:hover,
+.carousel-control-next:hover {
+    opacity: 1;
+}
+
+.carousel-indicators button {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+/* ========== FEATURES SECTION ========== */
+.feature-card {
+    background: white;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    border-color: var(--primary-color);
+}
+
+.feature-icon {
+    transition: transform 0.3s ease;
+}
+
+.feature-card:hover .feature-icon {
+    transform: scale(1.2);
+}
+
+/* ========== CATEGORIES SECTION ========== */
+.section-header {
+    position: relative;
+    padding-bottom: 20px;
+}
+
+.section-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 3px;
+    background: var(--primary-color);
+}
+
+.category-card .hover-card {
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.category-card:hover .hover-card {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 40px rgba(220,53,69,0.2);
+}
+
+.category-icon {
+    transition: all 0.3s ease;
+}
+
+.category-card:hover .category-icon i {
+    transform: scale(1.2) rotate(5deg);
+}
+
+.card-title {
+    color: var(--dark-bg);
+}
+
+/* ========== FOOTER STYLES ========== */
+.gaming-footer {
+    background: linear-gradient(to bottom, #0d1117, #000);
+}
+
+.footer-brand {
+    font-family: 'Rajdhani', sans-serif;
+}
+
+.footer-links li {
+    margin-bottom: 10px;
+}
+
+.footer-links a {
+    color: rgba(255,255,255,0.7);
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.footer-links a:hover {
+    color: var(--primary-color);
+    padding-left: 5px;
+}
+
+.footer-links a i {
+    font-size: 0.8rem;
+}
+
+.contact-info li {
+    display: flex;
+    align-items: flex-start;
+}
+
+.social-links a {
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.social-links a:hover {
+    background: var(--primary-color);
+    transform: translateY(-3px);
+}
+
+/* Payment & Shipping Icons */
+.payment-icon {
+    height: 30px;
+    background: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    filter: grayscale(100%);
+    transition: all 0.3s ease;
+}
+
+.payment-icon:hover {
+    filter: grayscale(0%);
+    transform: scale(1.1);
+}
+
+/* Back to Top Button */
+.back-to-top {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    z-index: 999;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    transition: all 0.3s ease;
+}
+
+.back-to-top:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 15px rgba(220,53,69,0.5);
+}
+
+.back-to-top.show {
+    display: flex;
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 991px) {
+    .search-form {
+        min-width: 100%;
+        margin: 10px 0;
+    }
+    
+    .gaming-icon-float {
+        font-size: 100px;
+    }
+    
+    .hero-slide {
+        min-height: 400px;
+    }
+}
+
+@media (max-width: 767px) {
+    .gaming-title {
+        font-size: 2rem;
+    }
+    
+    .feature-card {
+        margin-bottom: 20px;
+    }
+}
+
+/* ========== UTILITIES ========== */
+.text-gaming {
+    background: var(--gaming-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.btn-gaming {
+    background: var(--gaming-gradient);
+    border: none;
+    color: white;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-gaming:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(220,53,69,0.4);
+}
+
+.shadow-gaming {
+    box-shadow: 0 10px 40px rgba(220,53,69,0.3);
+}
+
+/* ========== PRODUCT CARD ========== */
+.product-card {
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.product-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+}
+
+.product-card .product-image {
+    overflow: hidden;
+    aspect-ratio: 1/1;
+    background: #f8f9fa;
+}
+
+.product-card .product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.product-card:hover .product-image img {
+    transform: scale(1.1);
+}
+
+.product-card .card-title a {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-height: 3em;
+    transition: color 0.3s ease;
+}
+
+.product-card .card-title a:hover {
+    color: var(--primary-color) !important;
+}
+
+.product-card .price-section {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.product-card .btn {
+    transition: all 0.3s ease;
+}
+
+.product-card .btn:hover {
+    transform: scale(1.05);
+}
+
+/* ========== ANIMATIONS ========== */
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+.pulse {
+    animation: pulse 2s infinite;
+}

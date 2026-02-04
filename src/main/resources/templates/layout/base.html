@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle} ?: 'Gaming Shop'">Gaming Shop</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+    
+    <!-- Page specific CSS -->
+    <th:block layout:fragment="css"></th:block>
+</head>
+<body>
+    <!-- Header -->
+    <header th:replace="~{layout/header :: header}"></header>
+    
+    <!-- Main Content -->
+    <main>
+        <div layout:fragment="content">
+            <!-- Content sẽ được thay thế ở đây -->
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer th:replace="~{layout/footer :: footer}"></footer>
+    
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script th:src="@{/js/main.js}"></script>
+    
+    <!-- Page specific JS -->
+    <th:block layout:fragment="scripts"></th:block>
+</body>
+</html>

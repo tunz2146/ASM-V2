@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Thông tin sản phẩm</title>
+</head>
+<body>
+    <div layout:fragment="content" class="container mt-4 mb-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-danger text-white">
+                        <h5 class="mb-0 fw-bold" 
+                            th:text="${product.id == null ? 'THÊM SẢN PHẨM MỚI' : 'CẬP NHẬT SẢN PHẨM'}">
+                            FORM
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <form th:action="@{/admin/products/save}" th:object="${product}" 
+                              method="post" enctype="multipart/form-data">
+                            
+                            <input type="hidden" th:field="*{id}">
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Tên sản phẩm</label>
+                                <input type="text" class="form-control" th:field="*{tenSanPham}" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Slug (Đường dẫn)</label>
+                                <input type="text" class="form-control" th:field="*{slug}" placeholder="ví-dụ-như-này" required>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Giá bán (VNĐ)</label>
+                                    <input type="number" class="form-control" th:field="*{giaSanPham}" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Giảm giá (%)</label>
+                                    <input type="number" class="form-control" th:field="*{chietKhau}" value="0">
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Số lượng tồn</label>
+                                    <input type="number" class="form-control" th:field="*{tonKho}" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Thương hiệu</label>
+                                    <select class="form-select" th:field="*{hang}">
+                                        <option th:each="h : ${brands}" 
+                                                th:value="${h.id}" 
+                                                th:text="${h.tenHang}"></option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Danh mục (Giữ Ctrl để chọn nhiều)</label>
+                                <select class="form-select" th:field="*{loaiSanPhams}" multiple size="4">
+                                    <option th:each="c : ${categories}" 
+                                            th:value="${c.id}" 
+                                            th:text="${c.ten}"></option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Hình ảnh</label>
+                                <input type="file" name="imageFile" class="form-control" accept="image/*">
+                                <div class="mt-2" th:if="${product.hinhAnh != null}">
+                                    <img th:src="@{'/images/products/' + ${product.hinhAnh}}" height="100" class="rounded border">
+                                    <small class="d-block text-muted">Ảnh hiện tại</small>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Mô tả / Thông số kỹ thuật</label>
+                                <textarea class="form-control" th:field="*{thongSo}" rows="4"></textarea>
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-danger px-4">Lưu lại</button>
+                                <a href="/admin/products" class="btn btn-secondary px-4">Hủy</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
