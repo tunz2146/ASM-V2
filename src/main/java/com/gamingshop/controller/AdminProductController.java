@@ -48,17 +48,20 @@ public class AdminProductController {
     // 3. Xử lý lưu (Thêm mới hoặc Cập nhật)
     @PostMapping("/save")
     public String save(@ModelAttribute("product") SanPham sanPham,
-                       @RequestParam("imageFile") MultipartFile imageFile) throws IOException {
+                       @RequestParam("imageFile") MultipartFile imageFile,
+                       @RequestParam("imageUrl") String imageUrl) throws IOException { // Thêm tham số imageUrl
         
-        // Nếu là update (có ID) nhưng không chọn ảnh mới -> Giữ ảnh cũ
-        if (sanPham.getId() != null && imageFile.isEmpty()) {
+        // Logic giữ ảnh cũ: Nếu không up ảnh mới VÀ không nhập URL mới -> Lấy lại ảnh cũ
+        if (sanPham.getId() != null && imageFile.isEmpty() && (imageUrl == null || imageUrl.isEmpty())) {
             SanPham oldProduct = sanPhamService.getProductById(sanPham.getId());
             if (oldProduct != null) {
                 sanPham.setHinhAnh(oldProduct.getHinhAnh());
             }
         }
         
-        sanPhamService.saveProduct(sanPham, imageFile);
+        // Gọi service với 3 tham số
+        sanPhamService.saveProduct(sanPham, imageFile, imageUrl);
+        
         return "redirect:/admin/products";
     }
 

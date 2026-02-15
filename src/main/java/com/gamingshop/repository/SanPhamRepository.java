@@ -13,7 +13,7 @@ public interface SanPhamRepository extends JpaRepository<SanPham, Long> {
     Page<SanPham> findByTenSanPhamContaining(String keyword, Pageable pageable);
     
     // 👇 HÀM MỚI: Tìm theo Slug của LoaiSanPham (Đi qua bảng trung gian)
-    Page<SanPham> findByLoaiSanPhams_Slug(String slug, Pageable pageable);
+    Page<SanPham> findDistinctByLoaiSanPhams_Slug(String slug, Pageable pageable);
 
     SanPham findBySlug(String slug);
 }

@@ -1,378 +1,437 @@
-<!DOCTYPE html>
-<html lang="vi" 
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/base}">
-<head>
+<!doctype html>
+<html
+  lang="vi"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{layout/base}"
+>
+  <head>
     <title>Gaming Shop - Thiết bị Gaming Chính Hãng</title>
-</head>
-<body>
+  </head>
+  <body>
     <div layout:fragment="content">
-        
-        <!-- Hero Section / Banner Chính -->
-        <section class="hero-section position-relative overflow-hidden">
-            <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
-                <div class="carousel-indicators">
-                    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"></button>
-                    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
-                    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"></button>
-                </div>
-                
-                <div class="carousel-inner">
-                    <!-- Slide 1 -->
-                    <div class="carousel-item active">
-                        <div class="hero-slide bg-gradient-dark">
-                            <div class="container">
-                                <div class="row align-items-center min-vh-50">
-                                    <div class="col-lg-6">
-                                        <div class="hero-content text-white">
-                                            <span class="badge bg-danger mb-3 px-3 py-2">🔥 Mới ra mắt</span>
-                                            <h1 class="display-3 fw-bold mb-4 gaming-title">
-                                                Nâng tầm<br>
-                                                <span class="text-danger">Gaming Setup</span>
-                                            </h1>
-                                            <p class="lead mb-4">
-                                                Thiết bị gaming chính hãng từ các thương hiệu hàng đầu thế giới. 
-                                                Giá tốt nhất, bảo hành uy tín.
-                                            </p>
-                                            <div class="d-flex gap-3">
-                                                <a href="/products" class="btn btn-danger btn-lg px-4">
-                                                    <i class="bi bi-cart-fill me-2"></i>Mua ngay
-                                                </a>
-                                                <a href="#features" class="btn btn-outline-light btn-lg px-4">
-                                                    Tìm hiểu thêm
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-6">
-                                        <div class="hero-image text-center">
-                                            <i class="bi bi-mouse display-1 text-danger gaming-icon-float"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+      <section class="hero-section position-relative overflow-hidden">
+        <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
+          <div class="carousel-indicators">
+            <button
+              type="button"
+              data-bs-target="#heroCarousel"
+              data-bs-slide-to="0"
+              class="active"
+            ></button>
+            <button
+              type="button"
+              data-bs-target="#heroCarousel"
+              data-bs-slide-to="1"
+            ></button>
+            <button
+              type="button"
+              data-bs-target="#heroCarousel"
+              data-bs-slide-to="2"
+            ></button>
+          </div>
+
+          <div class="carousel-inner">
+            <div class="carousel-item active">
+              <div class="hero-slide bg-gradient-dark">
+                <div class="container">
+                  <div class="row align-items-center min-vh-50">
+                    <div class="col-lg-6">
+                      <div class="hero-content text-white">
+                        <span class="badge bg-danger mb-3 px-3 py-2"
+                          >🔥 Mới ra mắt</span
+                        >
+                        <h1 class="display-3 fw-bold mb-4 gaming-title">
+                          Nâng tầm<br />
+                          <span class="text-danger">Gaming Setup</span>
+                        </h1>
+                        <p class="lead mb-4">
+                          Thiết bị gaming chính hãng từ các thương hiệu hàng đầu
+                          thế giới. Giá tốt nhất, bảo hành uy tín.
+                        </p>
+                        <div class="d-flex gap-3">
+                          <a
+                            href="/products"
+                            class="btn btn-danger btn-lg px-4"
+                          >
+                            <i class="bi bi-cart-fill me-2"></i>Mua ngay
+                          </a>
+                          <a
+                            href="#features"
+                            class="btn btn-outline-light btn-lg px-4"
+                          >
+                            Tìm hiểu thêm
+                          </a>
                         </div>
-                    </div>
-                    
-                    <!-- Slide 2 -->
-                    <div class="carousel-item">
-                        <div class="hero-slide bg-gradient-primary">
-                            <div class="container">
-                                <div class="row align-items-center min-vh-50">
-                                    <div class="col-lg-6">
-                                        <div class="hero-content text-white">
-                                            <span class="badge bg-warning text-dark mb-3 px-3 py-2">⚡ Khuyến mãi</span>
-                                            <h1 class="display-3 fw-bold mb-4">
-                                                Giảm giá<br>
-                                                <span class="text-warning">lên đến 30%</span>
-                                            </h1>
-                                            <p class="lead mb-4">
-                                                Săn deal cực khủng cho bàn phím cơ, chuột gaming từ Logitech, Razer, Corsair...
-                                            </p>
-                                            <a href="/deals" class="btn btn-warning btn-lg px-4 text-dark">
-                                                <i class="bi bi-percent me-2"></i>Xem ưu đãi
-                                            </a>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-6">
-                                        <div class="hero-image text-center">
-                                            <i class="bi bi-keyboard display-1 text-warning gaming-icon-float"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Slide 3 -->
-                    <div class="carousel-item">
-                        <div class="hero-slide bg-gradient-success">
-                            <div class="container">
-                                <div class="row align-items-center min-vh-50">
-                                    <div class="col-lg-6">
-                                        <div class="hero-content text-white">
-                                            <span class="badge bg-success mb-3 px-3 py-2">🎧 Tai nghe</span>
-                                            <h1 class="display-3 fw-bold mb-4">
-                                                Âm thanh<br>
-                                                <span class="text-success">Đỉnh cao</span>
-                                            </h1>
-                                            <p class="lead mb-4">
-                                                Tai nghe gaming 7.1 Surround, mic chống ồn, thiết kế êm tai cho trải nghiệm tối ưu.
-                                            </p>
-                                            <a href="/products?category=headset" class="btn btn-success btn-lg px-4">
-                                                <i class="bi bi-headphones me-2"></i>Khám phá
-                                            </a>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-6">
-                                        <div class="hero-image text-center">
-                                            <i class="bi bi-headphones display-1 text-success gaming-icon-float"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon"></span>
-                </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
-                    <span class="carousel-control-next-icon"></span>
-                </button>
-            </div>
-        </section>
-        
-        <!-- Features Section -->
-        <section id="features" class="features-section py-5 bg-light">
-            <div class="container">
-                <div class="row g-4">
-                    <div class="col-md-3 col-sm-6">
-                        <div class="feature-card text-center p-4 h-100">
-                            <div class="feature-icon mb-3">
-                                <i class="bi bi-truck fs-1 text-danger"></i>
-                            </div>
-                            <h5 class="fw-bold">Miễn phí vận chuyển</h5>
-                            <p class="text-muted mb-0">Đơn hàng từ 500K</p>
-                        </div>
-                    </div>
-                    <div class="col-md-3 col-sm-6">
-                        <div class="feature-card text-center p-4 h-100">
-                            <div class="feature-icon mb-3">
-                                <i class="bi bi-shield-check fs-1 text-success"></i>
-                            </div>
-                            <h5 class="fw-bold">Bảo hành chính hãng</h5>
-                            <p class="text-muted mb-0">Lên đến 24 tháng</p>
-                        </div>
-                    </div>
-                    <div class="col-md-3 col-sm-6">
-                        <div class="feature-card text-center p-4 h-100">
-                            <div class="feature-icon mb-3">
-                                <i class="bi bi-arrow-clockwise fs-1 text-warning"></i>
-                            </div>
-                            <h5 class="fw-bold">Đổi trả dễ dàng</h5>
-                            <p class="text-muted mb-0">Trong vòng 7 ngày</p>
-                        </div>
-                    </div>
-                    <div class="col-md-3 col-sm-6">
-                        <div class="feature-card text-center p-4 h-100">
-                            <div class="feature-icon mb-3">
-                                <i class="bi bi-headset fs-1 text-info"></i>
-                            </div>
-                            <h5 class="fw-bold">Hỗ trợ 24/7</h5>
-                            <p class="text-muted mb-0">Tư vấn nhiệt tình</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-        
-        <!-- Categories Section -->
-        <section class="categories-section py-5">
-            <div class="container">
-                <div class="section-header text-center mb-5">
-                    <h2 class="fw-bold display-5">Danh mục sản phẩm</h2>
-                    <p class="text-muted">Khám phá bộ sưu tập gaming gear đầy đủ</p>
-                </div>
-                
-                <div class="row g-4">
-                    <div class="col-lg-3 col-md-6">
-                        <a href="/products?category=mouse" class="category-card text-decoration-none">
-                            <div class="card border-0 shadow-sm h-100 hover-card">
-                                <div class="card-body text-center p-4">
-                                    <div class="category-icon mb-3">
-                                        <i class="bi bi-mouse display-3 text-danger"></i>
-                                    </div>
-                                    <h5 class="card-title fw-bold">Chuột Gaming</h5>
-                                    <p class="text-muted small mb-0">Độ chính xác cao, RGB đẹp mắt</p>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                    
-                    <div class="col-lg-3 col-md-6">
-                        <a href="/products?category=keyboard" class="category-card text-decoration-none">
-                            <div class="card border-0 shadow-sm h-100 hover-card">
-                                <div class="card-body text-center p-4">
-                                    <div class="category-icon mb-3">
-                                        <i class="bi bi-keyboard display-3 text-primary"></i>
-                                    </div>
-                                    <h5 class="card-title fw-bold">Bàn phím Gaming</h5>
-                                    <p class="text-muted small mb-0">Switch cơ học, phản hồi nhanh</p>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                    
-                    <div class="col-lg-3 col-md-6">
-                        <a href="/products?category=headset" class="category-card text-decoration-none">
-                            <div class="card border-0 shadow-sm h-100 hover-card">
-                                <div class="card-body text-center p-4">
-                                    <div class="category-icon mb-3">
-                                        <i class="bi bi-headphones display-3 text-success"></i>
-                                    </div>
-                                    <h5 class="card-title fw-bold">Tai nghe Gaming</h5>
-                                    <p class="text-muted small mb-0">Âm thanh sống động, mic HD</p>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                    
-                    <div class="col-lg-3 col-md-6">
-                        <a href="/products?category=mousepad" class="category-card text-decoration-none">
-                            <div class="card border-0 shadow-sm h-100 hover-card">
-                                <div class="card-body text-center p-4">
-                                    <div class="category-icon mb-3">
-                                        <i class="bi bi-app display-3 text-warning"></i>
-                                    </div>
-                                    <h5 class="card-title fw-bold">Mousepad</h5>
-                                    <p class="text-muted small mb-0">Bề mặt mượt, chống trượt</p>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </section>
-        
-        <!-- Featured Products - Sản phẩm mới nhất -->
-        <section class="products-section py-5 bg-light">
-            <div class="container">
-                <div class="section-header text-center mb-5">
-                    <h2 class="fw-bold display-5">
-                        <i class="bi bi-star-fill text-warning me-2"></i>
-                        Sản phẩm mới nhất
-                    </h2>
-                    <p class="text-muted">Những sản phẩm vừa ra mắt tại Gaming Shop</p>
-                </div>
-                
-                <!-- Hiển thị nếu có sản phẩm -->
-                <div th:if="${latestProducts != null and !latestProducts.isEmpty()}" class="row g-4">
-                    <div th:each="product : ${latestProducts}" class="col-lg-3 col-md-4 col-sm-6">
-                        <div class="product-card card h-100 border-0 shadow-sm">
-                            <!-- Product Image -->
-                            <div class="product-image position-relative">
-                                <img th:src="${product.hinhAnh != null ? '/images/products/' + product.hinhAnh : 'https://via.placeholder.com/300x300?text=No+Image'}" 
-                                     th:alt="${product.tenSanPham}"
-                                     class="card-img-top">
-                                
-                                <!-- Sale Badge -->
-                                <span th:if="${product.chietKhau != null and product.chietKhau > 0}" 
-                                      class="badge bg-danger position-absolute top-0 end-0 m-2">
-                                    -<span th:text="${product.chietKhau}"></span>%
-                                </span>
-                                
-                                <!-- Out of Stock Badge -->
-                                <span th:if="${product.tonKho == null or product.tonKho <= 0}" 
-                                      class="badge bg-secondary position-absolute top-0 start-0 m-2">
-                                    Hết hàng
-                                </span>
-                            </div>
-                            
-                            <!-- Product Body -->
-                            <div class="card-body">
-                                <!-- Brand -->
-                                <p class="text-muted small mb-1" th:if="${product.hang != null}">
-                                    <i class="bi bi-tag-fill me-1"></i>
-                                    <span th:text="${product.hang.tenHang}">Brand</span>
-                                </p>
-                                
-                                <!-- Product Name -->
-                                <h5 class="card-title mb-2">
-                                    <a th:href="@{'/products/' + ${product.slug}}" 
-                                       th:text="${product.tenSanPham}"
-                                       class="text-decoration-none text-dark">
-                                        Product Name
-                                    </a>
-                                </h5>
-                                
-                                <!-- Price -->
-                                <div class="price-section mb-3">
-                                    <span th:if="${product.chietKhau != null and product.chietKhau > 0}">
-                                        <span class="price-sale text-danger fw-bold fs-5">
-                                            [[${#numbers.formatInteger(product.giaSauGiam, 0, 'COMMA')}]]₫
-                                        </span>
-                                        <span class="price-original text-muted text-decoration-line-through small ms-2">
-                                            [[${#numbers.formatInteger(product.giaSanPham, 0, 'COMMA')}]]₫
-                                        </span>
-                                    </span>
-                                    <span th:unless="${product.chietKhau != null and product.chietKhau > 0}">
-                                        <span class="price-normal text-danger fw-bold fs-5">
-                                            [[${#numbers.formatInteger(product.giaSanPham, 0, 'COMMA')}]]₫
-                                        </span>
-                                    </span>
-                                </div>
-                                
-                                <!-- Actions -->
-                                <div class="d-grid gap-2">
-                                    <a th:href="@{'/products/' + ${product.slug}}" 
-                                       class="btn btn-outline-danger btn-sm">
-                                        <i class="bi bi-eye me-1"></i>Xem chi tiết
-                                    </a>
-                                    <button th:if="${product.tonKho != null and product.tonKho > 0}"
-                                            class="btn btn-danger btn-sm">
-                                        <i class="bi bi-cart-plus me-1"></i>Thêm vào giỏ
-                                    </button>
-                                    <button th:unless="${product.tonKho != null and product.tonKho > 0}"
-                                            class="btn btn-secondary btn-sm" disabled>
-                                        Hết hàng
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Hiển thị nếu không có sản phẩm -->
-                <div th:if="${latestProducts == null or latestProducts.isEmpty()}" 
-                     class="alert alert-warning text-center">
-                    <i class="bi bi-exclamation-triangle me-2"></i>
-                    <strong>Chưa có sản phẩm nào</strong>
-                    <br>
-                    <small class="text-muted">Vui lòng thêm dữ liệu vào database</small>
-                </div>
-                
-                <!-- View All Button -->
-                <div th:if="${latestProducts != null and !latestProducts.isEmpty()}" 
-                     class="text-center mt-4">
-                    <a href="/products" class="btn btn-danger btn-lg px-5">
-                        Xem tất cả sản phẩm
-                        <i class="bi bi-arrow-right ms-2"></i>
-                    </a>
-                </div>
-            </div>
-        </section>
-        
-        <!-- Newsletter Section -->
-        <section class="newsletter-section py-5 bg-dark text-white">
-            <div class="container">
-                <div class="row align-items-center">
-                    <div class="col-lg-6 mb-4 mb-lg-0">
-                        <h3 class="fw-bold mb-2">
-                            <i class="bi bi-envelope-fill text-danger me-2"></i>
-                            Đăng ký nhận tin
-                        </h3>
-                        <p class="mb-0 text-muted">Nhận thông tin về sản phẩm mới và khuyến mãi đặc biệt</p>
+                      </div>
                     </div>
                     <div class="col-lg-6">
-                        <form class="row g-2">
-                            <div class="col-md-8">
-                                <input type="email" class="form-control form-control-lg" 
-                                       placeholder="Nhập email của bạn...">
-                            </div>
-                            <div class="col-md-4">
-                                <button type="submit" class="btn btn-danger btn-lg w-100">
-                                    Đăng ký
-                                </button>
-                            </div>
-                        </form>
+                      <div class="hero-image text-center">
+                        <i
+                          class="bi bi-mouse display-1 text-danger gaming-icon-float"
+                        ></i>
+                      </div>
                     </div>
+                  </div>
                 </div>
+              </div>
             </div>
-        </section>
-        
+            <div class="carousel-item">
+              <div class="hero-slide bg-gradient-primary">
+                <div class="container">
+                  <div class="row align-items-center min-vh-50">
+                    <div class="col-lg-6">
+                      <div class="hero-content text-white">
+                        <span class="badge bg-warning text-dark mb-3 px-3 py-2"
+                          >⚡ Khuyến mãi</span
+                        >
+                        <h1 class="display-3 fw-bold mb-4">
+                          Giảm giá<br />
+                          <span class="text-warning">lên đến 30%</span>
+                        </h1>
+                        <p class="lead mb-4">
+                          Săn deal cực khủng cho bàn phím cơ, chuột gaming từ
+                          Logitech, Razer, Corsair...
+                        </p>
+                        <a
+                          href="/deals"
+                          class="btn btn-warning btn-lg px-4 text-dark"
+                        >
+                          <i class="bi bi-percent me-2"></i>Xem ưu đãi
+                        </a>
+                      </div>
+                    </div>
+                    <div class="col-lg-6">
+                      <div class="hero-image text-center">
+                        <i
+                          class="bi bi-keyboard display-1 text-warning gaming-icon-float"
+                        ></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="carousel-item">
+              <div class="hero-slide bg-gradient-success">
+                <div class="container">
+                  <div class="row align-items-center min-vh-50">
+                    <div class="col-lg-6">
+                      <div class="hero-content text-white">
+                        <span class="badge bg-success mb-3 px-3 py-2"
+                          >🎧 Tai nghe</span
+                        >
+                        <h1 class="display-3 fw-bold mb-4">
+                          Âm thanh<br />
+                          <span class="text-success">Đỉnh cao</span>
+                        </h1>
+                        <p class="lead mb-4">
+                          Tai nghe gaming 7.1 Surround, mic chống ồn, thiết kế
+                          êm tai cho trải nghiệm tối ưu.
+                        </p>
+                        <a
+                          href="/products?category=headset"
+                          class="btn btn-success btn-lg px-4"
+                        >
+                          <i class="bi bi-headphones me-2"></i>Khám phá
+                        </a>
+                      </div>
+                    </div>
+                    <div class="col-lg-6">
+                      <div class="hero-image text-center">
+                        <i
+                          class="bi bi-headphones display-1 text-success gaming-icon-float"
+                        ></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <button
+            class="carousel-control-prev"
+            type="button"
+            data-bs-target="#heroCarousel"
+            data-bs-slide="prev"
+          >
+            <span class="carousel-control-prev-icon"></span>
+          </button>
+          <button
+            class="carousel-control-next"
+            type="button"
+            data-bs-target="#heroCarousel"
+            data-bs-slide="next"
+          >
+            <span class="carousel-control-next-icon"></span>
+          </button>
+        </div>
+      </section>
+
+      <section id="features" class="features-section py-5 bg-light">
+        <div class="container">
+          <div class="row g-4">
+            <div class="col-md-3 col-sm-6">
+              <div class="feature-card text-center p-4 h-100">
+                <div class="feature-icon mb-3">
+                  <i class="bi bi-truck fs-1 text-danger"></i>
+                </div>
+                <h5 class="fw-bold">Miễn phí vận chuyển</h5>
+                <p class="text-muted mb-0">Đơn hàng từ 500K</p>
+              </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+              <div class="feature-card text-center p-4 h-100">
+                <div class="feature-icon mb-3">
+                  <i class="bi bi-shield-check fs-1 text-success"></i>
+                </div>
+                <h5 class="fw-bold">Bảo hành chính hãng</h5>
+                <p class="text-muted mb-0">Lên đến 24 tháng</p>
+              </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+              <div class="feature-card text-center p-4 h-100">
+                <div class="feature-icon mb-3">
+                  <i class="bi bi-arrow-clockwise fs-1 text-warning"></i>
+                </div>
+                <h5 class="fw-bold">Đổi trả dễ dàng</h5>
+                <p class="text-muted mb-0">Trong vòng 7 ngày</p>
+              </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+              <div class="feature-card text-center p-4 h-100">
+                <div class="feature-icon mb-3">
+                  <i class="bi bi-headset fs-1 text-info"></i>
+                </div>
+                <h5 class="fw-bold">Hỗ trợ 24/7</h5>
+                <p class="text-muted mb-0">Tư vấn nhiệt tình</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="categories-section py-5">
+        <div class="container">
+          <div class="section-header text-center mb-5">
+            <h2 class="fw-bold display-5">Danh mục sản phẩm</h2>
+            <p class="text-muted">Khám phá bộ sưu tập gaming gear đầy đủ</p>
+          </div>
+          <div class="row g-4">
+            <div class="col-lg-3 col-md-6">
+              <a
+                href="/products?category=mouse"
+                class="category-card text-decoration-none"
+              >
+                <div class="card border-0 shadow-sm h-100 hover-card">
+                  <div class="card-body text-center p-4">
+                    <div class="category-icon mb-3">
+                      <i class="bi bi-mouse display-3 text-danger"></i>
+                    </div>
+                    <h5 class="card-title fw-bold">Chuột Gaming</h5>
+                    <p class="text-muted small mb-0">Độ chính xác cao</p>
+                  </div>
+                </div>
+              </a>
+            </div>
+            <div class="col-lg-3 col-md-6">
+              <a
+                href="/products?category=keyboard"
+                class="category-card text-decoration-none"
+              >
+                <div class="card border-0 shadow-sm h-100 hover-card">
+                  <div class="card-body text-center p-4">
+                    <div class="category-icon mb-3">
+                      <i class="bi bi-keyboard display-3 text-primary"></i>
+                    </div>
+                    <h5 class="card-title fw-bold">Bàn phím</h5>
+                    <p class="text-muted small mb-0">Switch cơ học</p>
+                  </div>
+                </div>
+              </a>
+            </div>
+            <div class="col-lg-3 col-md-6">
+              <a
+                href="/products?category=headset"
+                class="category-card text-decoration-none"
+              >
+                <div class="card border-0 shadow-sm h-100 hover-card">
+                  <div class="card-body text-center p-4">
+                    <div class="category-icon mb-3">
+                      <i class="bi bi-headphones display-3 text-success"></i>
+                    </div>
+                    <h5 class="card-title fw-bold">Tai nghe</h5>
+                    <p class="text-muted small mb-0">Âm thanh 7.1</p>
+                  </div>
+                </div>
+              </a>
+            </div>
+            <div class="col-lg-3 col-md-6">
+              <a
+                href="/products?category=mousepad"
+                class="category-card text-decoration-none"
+              >
+                <div class="card border-0 shadow-sm h-100 hover-card">
+                  <div class="card-body text-center p-4">
+                    <div class="category-icon mb-3">
+                      <i class="bi bi-app display-3 text-warning"></i>
+                    </div>
+                    <h5 class="card-title fw-bold">Mousepad</h5>
+                    <p class="text-muted small mb-0">Chống trượt</p>
+                  </div>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="products-section py-5 bg-light">
+        <div class="container">
+          <div class="section-header text-center mb-5">
+            <h2 class="fw-bold display-5">
+              <i class="bi bi-star-fill text-warning me-2"></i>
+              Sản phẩm mới nhất
+            </h2>
+            <p class="text-muted">Những sản phẩm vừa ra mắt tại Gaming Shop</p>
+          </div>
+
+          <div
+            th:if="${latestProducts != null and !latestProducts.isEmpty()}"
+            class="row g-4"
+          >
+            <div
+              th:each="product : ${latestProducts}"
+              class="col-lg-3 col-md-4 col-sm-6"
+            >
+              <div class="product-card card h-100 border-0 shadow-sm">
+                <div class="product-image">
+                  <a th:href="@{'/products/' + ${product.slug}}">
+                    <img
+                      th:src="${product.hinhAnh != null && #strings.startsWith(product.hinhAnh, 'http') ? product.hinhAnh : '/images/products/' + product.hinhAnh}"
+                      th:alt="${product.tenSanPham}"
+                      onerror="
+                        this.src =
+                          'https://via.placeholder.com/300x300?text=Lỗi+Ảnh'
+                      "
+                    />
+                  </a>
+                  <span
+                    th:if="${product.chietKhau != null and product.chietKhau > 0}"
+                    class="badge bg-danger position-absolute top-0 end-0 m-3 shadow-sm"
+                  >
+                    -[[${product.chietKhau}]]%
+                  </span>
+                </div>
+
+                <div class="card-body d-flex flex-column">
+                  <div class="mb-2" th:if="${product.hang != null}">
+                    <small class="text-muted"
+                      ><i class="bi bi-tag-fill me-1"></i>
+                      [[${product.hang.tenHang}]]</small
+                    >
+                  </div>
+
+                  <h5 class="card-title">
+                    <a
+                      th:href="@{'/products/' + ${product.slug}}"
+                      th:text="${product.tenSanPham}"
+                      class="text-decoration-none text-dark"
+                    >
+                      Tên sản phẩm
+                    </a>
+                  </h5>
+
+                  <div class="mt-auto">
+                    <div class="price-section mb-3">
+                      <span th:if="${product.chietKhau > 0}">
+                        <span class="text-danger fw-bold fs-5"
+                          >[[${#numbers.formatInteger(product.giaSauGiam, 0,
+                          'COMMA')}]]₫</span
+                        >
+                        <span
+                          class="text-muted text-decoration-line-through small ms-2"
+                          >[[${#numbers.formatInteger(product.giaSanPham, 0,
+                          'COMMA')}]]₫</span
+                        >
+                      </span>
+                      <span th:unless="${product.chietKhau > 0}">
+                        <span class="text-danger fw-bold fs-5"
+                          >[[${#numbers.formatInteger(product.giaSanPham, 0,
+                          'COMMA')}]]₫</span
+                        >
+                      </span>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                      <a
+                        th:href="@{'/products/' + ${product.slug}}"
+                        class="btn btn-outline-danger btn-sm"
+                      >
+                        <i class="bi bi-eye me-1"></i> Xem chi tiết
+                      </a>
+                      <button class="btn btn-danger btn-sm">
+                        <i class="bi bi-cart-plus me-1"></i> Thêm vào giỏ
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div
+            th:if="${latestProducts == null or latestProducts.isEmpty()}"
+            class="alert alert-warning text-center"
+          >
+            Chưa có sản phẩm nào.
+          </div>
+
+          <div
+            th:if="${latestProducts != null and !latestProducts.isEmpty()}"
+            class="text-center mt-5 pb-4"
+          >
+            <a
+              href="/products"
+              class="btn btn-dark btn-lg px-5 rounded-pill shadow-sm"
+            >
+              Xem tất cả sản phẩm <i class="bi bi-arrow-right ms-2"></i>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section class="newsletter-section py-5 bg-dark text-white">
+        <div class="container">
+          <div class="row align-items-center">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+              <h3 class="fw-bold mb-2">
+                <i class="bi bi-envelope-fill text-danger me-2"></i>
+                Đăng ký nhận tin
+              </h3>
+              <p class="mb-0 text-muted">
+                Nhận thông tin về sản phẩm mới và khuyến mãi đặc biệt
+              </p>
+            </div>
+            <div class="col-lg-6">
+              <form class="row g-2">
+                <div class="col-md-8">
+                  <input
+                    type="email"
+                    class="form-control form-control-lg"
+                    placeholder="Nhập email của bạn..."
+                  />
+                </div>
+                <div class="col-md-4">
+                  <button type="submit" class="btn btn-danger btn-lg w-100">
+                    Đăng ký
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
-</body>
+  </body>
 </html>
