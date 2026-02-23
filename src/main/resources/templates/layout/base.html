@@ -3,6 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+
     <title th:text="${pageTitle} ?: 'Gaming Shop'">Gaming Shop</title>
 
     <!-- Bootstrap 5 CSS -->
@@ -53,5 +57,82 @@
 
     <!-- Page specific JS -->
     <th:block layout:fragment="scripts"></th:block>
+
+    <!-- Cart Script -->
+    <script>
+      function addToCart(productId, quantity = 1) {
+        const csrfToken =
+          document.querySelector('meta[name="_csrf"]')?.content || "";
+        const csrfHeader =
+          document.querySelector('meta[name="_csrf_header"]')?.content ||
+          "X-CSRF-TOKEN";
+
+        fetch("/cart/add", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            [csrfHeader]: csrfToken,
+          },
+          body: `productId=${productId}&quantity=${quantity}`,
+        })
+          .then((r) => r.json())
+          .then((data) => {
+            if (data.redirect) {
+              // Chưa đăng nhập → chuyển trang login
+              window.location.href = data.redirect;
+              return;
+            }
+            if (data.success) {
+              // Cập nhật badge
+              const badge = document.querySelector(".cart-badge");
+              if (badge) {
+                badge.textContent = data.cartCount;
+                badge.style.display = "flex";
+              }
+              // Hiện toast thành công
+              showCartToast("✅ Đã thêm vào giỏ hàng!", "success");
+            } else {
+              showCartToast("❌ " + data.message, "error");
+            }
+          })
+          .catch(() => showCartToast("Lỗi kết nối!", "error"));
+      }
+
+      function showCartToast(msg, type) {
+        // Tạo toast nhỏ góc trên phải
+        let container = document.getElementById("globalToastContainer");
+        if (!container) {
+          container = document.createElement("div");
+          container.id = "globalToastContainer";
+          container.style.cssText =
+            "position:fixed;top:75px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px;";
+          document.body.appendChild(container);
+        }
+
+        const toast = document.createElement("div");
+        toast.style.cssText = `
+        background:${type === "success" ? "#28a745" : "#dc3545"};
+        color:white;padding:12px 20px;border-radius:10px;
+        box-shadow:0 4px 20px rgba(0,0,0,.15);font-weight:500;
+        animation:slideIn .3s ease;min-width:250px;
+    `;
+        toast.textContent = msg;
+
+        if (!document.getElementById("toastKeyframes")) {
+          const style = document.createElement("style");
+          style.id = "toastKeyframes";
+          style.textContent =
+            "@keyframes slideIn{from{transform:translateX(120%);opacity:0}to{transform:translateX(0);opacity:1}}";
+          document.head.appendChild(style);
+        }
+
+        container.appendChild(toast);
+        setTimeout(() => {
+          toast.style.opacity = "0";
+          toast.style.transition = "opacity .3s";
+          setTimeout(() => toast.remove(), 300);
+        }, 2500);
+      }
+    </script>
   </body>
 </html>
