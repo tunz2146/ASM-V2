@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head><title>Về chúng tôi</title></head>
+<body>
+<div layout:fragment="content">
+
+    <!-- Hero -->
+    <div class="bg-dark text-white py-5">
+        <div class="container text-center">
+            <h1 class="display-5 fw-bold">
+                <i class="bi bi-controller text-danger me-2"></i>
+                VỀ GAMING<span class="text-danger">SHOP</span>
+            </h1>
+            <p class="lead text-white-50 mt-3">
+                Người bạn đồng hành của mọi game thủ Việt từ năm 2020
+            </p>
+        </div>
+    </div>
+
+    <div class="container py-5">
+
+        <!-- Câu chuyện -->
+        <div class="row align-items-center mb-5">
+            <div class="col-lg-6">
+                <h2 class="fw-bold mb-3">Câu chuyện của chúng tôi</h2>
+                <p class="text-muted">
+                    GamingShop ra đời từ niềm đam mê gaming và mong muốn mang đến
+                    cho cộng đồng game thủ Việt Nam những thiết bị chất lượng cao
+                    với mức giá hợp lý nhất.
+                </p>
+                <p class="text-muted">
+                    Chúng tôi là đối tác chính thức của Logitech, Razer, Corsair,
+                    HyperX tại Việt Nam, đảm bảo 100% hàng chính hãng, bảo hành
+                    đầy đủ theo tiêu chuẩn quốc tế.
+                </p>
+                <div class="row g-3 mt-3">
+                    <div class="col-6">
+                        <div class="card border-0 bg-light text-center p-3">
+                            <div class="fs-2 fw-bold text-danger">5+</div>
+                            <div class="small text-muted">Năm kinh nghiệm</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="card border-0 bg-light text-center p-3">
+                            <div class="fs-2 fw-bold text-danger">50K+</div>
+                            <div class="small text-muted">Khách hàng tin tưởng</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="card border-0 bg-light text-center p-3">
+                            <div class="fs-2 fw-bold text-danger">500+</div>
+                            <div class="small text-muted">Sản phẩm đa dạng</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="card border-0 bg-light text-center p-3">
+                            <div class="fs-2 fw-bold text-danger">4.9⭐</div>
+                            <div class="small text-muted">Đánh giá trung bình</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center mt-4 mt-lg-0">
+                <div class="position-relative d-inline-block">
+                    <i class="bi bi-controller" style="font-size:180px;color:#dc3545;opacity:.15;
+                       position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);"></i>
+                    <div class="card border-0 shadow-lg p-5" style="position:relative;z-index:2;">
+                        <i class="bi bi-award-fill text-danger" style="font-size:80px;"></i>
+                        <h4 class="fw-bold mt-3">Cam kết của chúng tôi</h4>
+                        <p class="text-muted small">Hàng chính hãng 100% · Bảo hành uy tín · Hỗ trợ 24/7</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Thương hiệu đối tác -->
+        <div class="text-center mb-5">
+            <h3 class="fw-bold mb-4">Thương hiệu chúng tôi phân phối</h3>
+            <div class="row g-4 justify-content-center">
+                <div class="col-6 col-md-3" th:each="brand : ${ {'Logitech','Razer','Corsair','HyperX'} }">
+                    <div class="card border-0 shadow-sm p-4 text-center hover-card" style="transition:.3s;">
+                        <i class="bi bi-controller text-danger mb-2" style="font-size:2rem;"></i>
+                        <div class="fw-bold" th:text="${brand}">Brand</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Đội ngũ -->
+        <div class="text-center">
+            <h3 class="fw-bold mb-4">Liên hệ với chúng tôi</h3>
+            <div class="row g-4 justify-content-center">
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm p-4 text-center">
+                        <i class="bi bi-geo-alt-fill text-danger fs-1 mb-3"></i>
+                        <h6 class="fw-bold">Địa chỉ</h6>
+                        <p class="text-muted small mb-0">123 Nguyễn Huệ, Q.1, TP.HCM</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm p-4 text-center">
+                        <i class="bi bi-telephone-fill text-danger fs-1 mb-3"></i>
+                        <h6 class="fw-bold">Hotline</h6>
+                        <p class="text-muted small mb-0">0987 654 321</p>
+                        <p class="text-muted small">Mở cửa: 8:00 - 22:00</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm p-4 text-center">
+                        <i class="bi bi-envelope-fill text-danger fs-1 mb-3"></i>
+                        <h6 class="fw-bold">Email</h6>
+                        <p class="text-muted small mb-0">support@gamingshop.vn</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Khuyến mãi</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <!-- Banner -->
+    <div class="bg-dark text-white py-5 text-center position-relative overflow-hidden">
+        <div class="container position-relative" style="z-index: 2;">
+            <span class="badge bg-danger fs-6 px-3 py-2 mb-3">🔥 HOT DEALS</span>
+            <h1 class="display-4 fw-bold">KHUYẾN MÃI SỐC</h1>
+            <p class="lead text-white-50">Ưu đãi cực khủng - Số lượng có hạn!</p>
+            <div class="d-flex justify-content-center gap-4 mt-4">
+                <div class="text-center">
+                    <div class="fs-2 fw-bold text-danger" id="countdown-hours">00</div>
+                    <small class="text-muted">Giờ</small>
+                </div>
+                <div class="fs-2 fw-bold text-white">:</div>
+                <div class="text-center">
+                    <div class="fs-2 fw-bold text-danger" id="countdown-minutes">00</div>
+                    <small class="text-muted">Phút</small>
+                </div>
+                <div class="fs-2 fw-bold text-white">:</div>
+                <div class="text-center">
+                    <div class="fs-2 fw-bold text-danger" id="countdown-seconds">00</div>
+                    <small class="text-muted">Giây</small>
+                </div>
+            </div>
+        </div>
+        <!-- Background decoration -->
+        <div style="position:absolute;top:-50px;right:-50px;width:300px;height:300px;
+                    background:rgba(220,53,69,0.1);border-radius:50%;z-index:1;"></div>
+    </div>
+
+    <!-- Mã giảm giá -->
+    <div class="bg-warning py-3">
+        <div class="container">
+            <div class="row g-3">
+                <div class="col-md-4" th:each="voucher : ${ {
+                    {'GAMING10','Giảm 10% toàn bộ đơn hàng','Tối thiểu 500K'},
+                    {'MOUSE20','Giảm 20% chuột gaming','Tối thiểu 800K'},
+                    {'FREE_SHIP','Miễn phí vận chuyển','Không giới hạn'}
+                } }">
+                </div>
+            </div>
+            <!-- Voucher cards tĩnh -->
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="card border-danger border-2 h-100">
+                        <div class="card-body d-flex align-items-center gap-3">
+                            <div class="bg-danger rounded p-3 text-white fs-4"><i class="bi bi-percent"></i></div>
+                            <div>
+                                <div class="fw-bold text-danger fs-5">GAMING10</div>
+                                <div class="small">Giảm 10% toàn bộ đơn hàng</div>
+                                <div class="small text-muted">Tối thiểu 500K</div>
+                            </div>
+                            <button class="btn btn-outline-danger btn-sm ms-auto"
+                                    onclick="copyCode('GAMING10')">Sao chép</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-primary border-2 h-100">
+                        <div class="card-body d-flex align-items-center gap-3">
+                            <div class="bg-primary rounded p-3 text-white fs-4"><i class="bi bi-mouse"></i></div>
+                            <div>
+                                <div class="fw-bold text-primary fs-5">MOUSE20</div>
+                                <div class="small">Giảm 20% chuột gaming</div>
+                                <div class="small text-muted">Tối thiểu 800K</div>
+                            </div>
+                            <button class="btn btn-outline-primary btn-sm ms-auto"
+                                    onclick="copyCode('MOUSE20')">Sao chép</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-success border-2 h-100">
+                        <div class="card-body d-flex align-items-center gap-3">
+                            <div class="bg-success rounded p-3 text-white fs-4"><i class="bi bi-truck"></i></div>
+                            <div>
+                                <div class="fw-bold text-success fs-5">FREE_SHIP</div>
+                                <div class="small">Miễn phí vận chuyển</div>
+                                <div class="small text-muted">Không giới hạn</div>
+                            </div>
+                            <button class="btn btn-outline-success btn-sm ms-auto"
+                                    onclick="copyCode('FREE_SHIP')">Sao chép</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sản phẩm khuyến mãi -->
+    <div class="container py-5">
+        <h3 class="fw-bold mb-4">
+            <i class="bi bi-fire text-danger me-2"></i>Sản phẩm đang giảm giá
+        </h3>
+        <div class="row g-4">
+            <div th:each="p : ${dealProducts}" class="col-lg-3 col-md-4 col-sm-6">
+                <div class="product-card card h-100 border-0 shadow-sm">
+                    <div class="product-image position-relative">
+                        <a th:href="@{'/products/' + ${p.slug}}">
+                            <img th:src="${p.hinhAnh != null && #strings.startsWith(p.hinhAnh, 'http') ?
+                                          p.hinhAnh : '/images/products/' + p.hinhAnh}"
+                                 th:alt="${p.tenSanPham}"
+                                 onerror="this.src='https://via.placeholder.com/300?text=No+Image'"/>
+                        </a>
+                        <span th:if="${p.chietKhau != null and p.chietKhau > 0}"
+                              class="badge bg-danger position-absolute top-0 end-0 m-2 fs-6">
+                            -[[${p.chietKhau}]]%
+                        </span>
+                    </div>
+                    <div class="card-body">
+                        <h6 class="card-title">
+                            <a th:href="@{'/products/' + ${p.slug}}" th:text="${p.tenSanPham}"
+                               class="text-decoration-none text-dark"></a>
+                        </h6>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="fw-bold text-danger">
+                                [[${#numbers.formatInteger(p.giaSauGiam, 0, 'COMMA')}]]₫
+                            </span>
+                            <span th:if="${p.chietKhau > 0}"
+                                  class="text-muted text-decoration-line-through small">
+                                [[${#numbers.formatInteger(p.giaSanPham, 0, 'COMMA')}]]₫
+                            </span>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-white border-0 pb-3">
+                        <button class="btn btn-danger w-100 btn-sm">
+                            <i class="bi bi-cart-plus me-1"></i>Thêm vào giỏ
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="scripts">
+<script>
+    // Countdown 24h
+    function startCountdown() {
+        const end = new Date();
+        end.setHours(23, 59, 59, 0);
+        setInterval(() => {
+            const now = new Date();
+            let diff = Math.floor((end - now) / 1000);
+            if (diff < 0) diff = 0;
+            const h = Math.floor(diff / 3600);
+            const m = Math.floor((diff % 3600) / 60);
+            const s = diff % 60;
+            document.getElementById('countdown-hours').textContent = String(h).padStart(2,'0');
+            document.getElementById('countdown-minutes').textContent = String(m).padStart(2,'0');
+            document.getElementById('countdown-seconds').textContent = String(s).padStart(2,'0');
+        }, 1000);
+    }
+
+    function copyCode(code) {
+        navigator.clipboard.writeText(code).then(() => {
+            alert('✅ Đã sao chép mã: ' + code);
+        });
+    }
+
+    startCountdown();
+</script>
+</th:block>
+</body>
+</html>

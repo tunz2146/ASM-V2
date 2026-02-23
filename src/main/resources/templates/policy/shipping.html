@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head><title>Chính sách vận chuyển</title></head>
+<body>
+<div layout:fragment="content">
+    <div class="bg-dark text-white py-4">
+        <div class="container">
+            <h2 class="fw-bold"><i class="bi bi-truck text-danger me-2"></i>Chính sách vận chuyển</h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="/" class="text-white-50">Trang chủ</a></li>
+                    <li class="breadcrumb-item active text-danger">Vận chuyển</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm p-4">
+
+                    <h5 class="fw-bold text-danger mb-3">
+                        <i class="bi bi-1-circle me-2"></i>Phạm vi giao hàng
+                    </h5>
+                    <p class="text-muted">Chúng tôi giao hàng toàn quốc 63 tỉnh thành thông qua các đối tác
+                    vận chuyển uy tín: GHTK, GHN, J&T Express, ViettelPost.</p>
+
+                    <hr>
+                    <h5 class="fw-bold text-danger mb-3">
+                        <i class="bi bi-2-circle me-2"></i>Thời gian giao hàng
+                    </h5>
+                    <ul class="text-muted">
+                        <li>Nội thành TP.HCM & Hà Nội: <strong>1 - 2 ngày</strong></li>
+                        <li>Các tỉnh thành khác: <strong>2 - 5 ngày</strong></li>
+                        <li>Vùng sâu, vùng xa: <strong>5 - 7 ngày</strong></li>
+                    </ul>
+
+                    <hr>
+                    <h5 class="fw-bold text-danger mb-3">
+                        <i class="bi bi-3-circle me-2"></i>Phí vận chuyển
+                    </h5>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Giá trị đơn hàng</th>
+                                    <th>Phí ship</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Dưới 500.000₫</td>
+                                    <td>30.000₫ - 50.000₫</td>
+                                </tr>
+                                <tr>
+                                    <td>Từ 500.000₫ - 1.000.000₫</td>
+                                    <td>Miễn phí (nội thành)</td>
+                                </tr>
+                                <tr class="table-success">
+                                    <td>Trên 1.000.000₫</td>
+                                    <td><strong>Miễn phí toàn quốc</strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <hr>
+                    <h5 class="fw-bold text-danger mb-3">
+                        <i class="bi bi-4-circle me-2"></i>Lưu ý khi nhận hàng
+                    </h5>
+                    <ul class="text-muted">
+                        <li>Kiểm tra kỹ hàng hóa trước khi ký nhận</li>
+                        <li>Quay video unbox nếu nghi ngờ hàng có vấn đề</li>
+                        <li>Liên hệ hotline ngay nếu phát hiện hàng lỗi</li>
+                    </ul>
+
+                    <div class="alert alert-info mt-3">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Mọi thắc mắc vui lòng liên hệ: <strong>0987 654 321</strong>
+                        hoặc email <strong>support@gamingshop.vn</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head><title>Chính sách bảo hành</title></head>
+<body>
+<div layout:fragment="content">
+    <div class="bg-dark text-white py-4">
+        <div class="container">
+            <h2 class="fw-bold"><i class="bi bi-shield-check text-danger me-2"></i>Chính sách bảo hành</h2>
+        </div>
+    </div>
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm p-4">
+                    <h5 class="fw-bold text-danger">Thời hạn bảo hành</h5>
+                    <div class="table-responsive mt-3">
+                        <table class="table table-bordered">
+                            <thead class="table-dark">
+                                <tr><th>Loại sản phẩm</th><th>Thời hạn BH</th><th>Hình thức</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>Chuột Gaming</td><td>12 - 24 tháng</td><td>1 đổi 1 trong 30 ngày</td></tr>
+                                <tr><td>Bàn phím Gaming</td><td>12 - 24 tháng</td><td>1 đổi 1 trong 30 ngày</td></tr>
+                                <tr><td>Tai nghe Gaming</td><td>12 tháng</td><td>Sửa chữa hoặc đổi mới</td></tr>
+                                <tr><td>Mousepad</td><td>6 tháng</td><td>Đổi mới nếu lỗi NSX</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <hr>
+                    <h5 class="fw-bold text-danger">Điều kiện bảo hành</h5>
+                    <ul class="text-muted mt-3">
+                        <li>Sản phẩm còn trong thời hạn bảo hành</li>
+                        <li>Lỗi do nhà sản xuất, không phải do người dùng</li>
+                        <li>Còn tem bảo hành, không bị can thiệp tự ý</li>
+                        <li>Có hóa đơn mua hàng tại GamingShop</li>
+                    </ul>
+                    <div class="alert alert-warning mt-3">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        Không bảo hành các trường hợp: vỡ, bể, ngấm nước, cháy do điện,...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

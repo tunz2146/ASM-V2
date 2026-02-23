@@ -38,18 +38,36 @@ public class SecurityConfig {
         // ... (Giữ nguyên code phần authorizeHttpRequests cũ) ...
         http
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/home", "/products/**", "/css/**", "/js/**", "/images/**", "/register", "/login").permitAll()
-                .requestMatchers("/admin/**").hasRole("ADMIN")
-                .anyRequest().authenticated()
-            )
+            .requestMatchers(
+                "/", "/home",
+                "/products/**",
+                "/css/**", "/js/**", "/images/**",
+                "/register", "/login",
+
+                // Các trang public thêm vào
+                "/deals", "/about", "/contact",
+                "/shipping", "/warranty", "/return",
+                "/privacy", "/terms"
+            ).permitAll()
+
+            .requestMatchers("/admin/**").hasRole("ADMIN")
+            .requestMatchers("/cart/**").authenticated()
+            
+            .anyRequest().authenticated()
+        )
             .formLogin(form -> form
-                .loginPage("/login")
-                .loginProcessingUrl("/do-login")
-                .defaultSuccessUrl("/", true)
-                .failureUrl("/login?error=true")
-                .permitAll()
-            )
-            .logout(logout -> logout.permitAll());
+            .loginPage("/login")
+            .loginProcessingUrl("/do-login")
+            .defaultSuccessUrl("/", true)
+            .failureUrl("/login?error=true")
+            .permitAll()
+        )
+
+        .logout(logout -> logout
+            .logoutUrl("/logout")
+            .logoutSuccessUrl("/")
+            .permitAll()
+        );
         
         return http.build();
     }

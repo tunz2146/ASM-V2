@@ -49,6 +49,6 @@ public class ProductController {
             model.addAttribute("pageTitle", "Tất cả sản phẩm");
         }
         
-        return "product/list";
+        return "admin/product/list";
     }
 }
