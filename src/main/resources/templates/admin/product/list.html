@@ -161,9 +161,12 @@
                   </div>
 
                   <div class="card-footer bg-white border-0 pb-3">
-                    <button class="btn btn-outline-danger w-100 btn-sm">
-                      <i class="bi bi-cart-plus me-1"></i> Thêm vào giỏ
-                    </button>
+                    <button
+                        class="btn btn-danger btn-sm"
+                        th:onclick="'addToCart(' + ${product.id} + ')'"
+                      >
+                        <i class="bi bi-cart-plus me-1"></i> Thêm vào giỏ
+                      </button>
                   </div>
                 </div>
               </div>

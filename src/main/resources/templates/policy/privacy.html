@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Điều khoản sử dụng - Gaming Shop</title>
+    <th:block layout:fragment="css">
+    <style>
+        .policy-hero {
+            background: linear-gradient(135deg,#0d1117 0%,#0a0a1a 60%,#0d1117 100%);
+            padding: 52px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .policy-hero::before {
+            content: '';
+            position: absolute;
+            top: -80px; right: -80px;
+            width: 380px; height: 380px;
+            background: radial-gradient(circle,rgba(220,53,69,.12) 0%,transparent 70%);
+            border-radius: 50%;
+        }
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(220,53,69,.15);
+            border: 1px solid rgba(220,53,69,.3);
+            color: #ff6b7a;
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-size: .84rem;
+            font-weight: 500;
+            margin-bottom: 14px;
+        }
+        .policy-nav .list-group-item {
+            border: none; border-radius: 10px !important;
+            margin-bottom: 4px; font-weight: 500;
+            color: #555; padding: 12px 16px;
+            transition: all .2s;
+        }
+        .policy-nav .list-group-item:hover { background: #fff0f1; color: #dc3545; padding-left: 22px; }
+        .policy-nav .list-group-item.active {
+            background: linear-gradient(135deg,#dc3545,#c82333);
+            color: #fff; box-shadow: 0 4px 12px rgba(220,53,69,.35);
+        }
+        .sec-title {
+            font-size: 1.2rem; font-weight: 700; color: #1a1a2e;
+            padding-bottom: 12px; border-bottom: 2px solid #f0f0f0;
+            margin-bottom: 18px; display: flex; align-items: center; gap: 10px;
+        }
+        .sec-title i { color: #dc3545; }
+        .terms-card {
+            background: #fff;
+            border: 1px solid #f0f0f0;
+            border-radius: 14px;
+            padding: 22px 26px;
+            margin-bottom: 22px;
+            position: relative;
+            overflow: hidden;
+            transition: box-shadow .25s;
+        }
+        .terms-card::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 4px;
+            background: linear-gradient(180deg,#dc3545,#c82333);
+            border-radius: 4px 0 0 4px;
+        }
+        .terms-card:hover { box-shadow: 0 6px 22px rgba(220,53,69,.09); }
+        .terms-card h6 { font-weight: 700; color: #1a1a2e; margin-bottom: 10px; font-size: .97rem; }
+        .terms-card p, .terms-card li { color: #555; font-size: .88rem; line-height: 1.7; }
+        .terms-list { list-style: none; padding: 0; margin: 0; }
+        .terms-list li {
+            display: flex; align-items: flex-start;
+            gap: 10px; padding: 7px 0;
+            font-size: .87rem; color: #444;
+            border-bottom: 1px solid #f8f8f8;
+        }
+        .terms-list li:last-child { border-bottom: none; }
+        .terms-list li i { margin-top: 3px; flex-shrink: 0; }
+        .warning-box {
+            background: linear-gradient(135deg,#fff3cd,#ffeeba);
+            border: 1px solid #ffc107;
+            border-left: 5px solid #ffc107;
+            border-radius: 11px;
+            padding: 18px 22px;
+        }
+        .contact-box {
+            background: linear-gradient(135deg,#0d1117,#1a1a2e);
+            border-radius: 14px; padding: 28px; color: #fff;
+            position: relative; overflow: hidden;
+        }
+        .contact-box::before {
+            content: '';
+            position: absolute; top:-40px; right:-40px;
+            width:180px; height:180px;
+            background: radial-gradient(circle,rgba(220,53,69,.18) 0%,transparent 70%);
+            border-radius: 50%;
+        }
+        .c-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 11px 0; border-bottom: 1px solid rgba(255,255,255,.08);
+            position: relative; z-index: 1;
+        }
+        .c-item:last-child { border-bottom: none; }
+        .c-ico {
+            width: 38px; height: 38px;
+            background: rgba(220,53,69,.18);
+            border-radius: 9px;
+            display: flex; align-items: center; justify-content: center;
+            color: #ff6b7a; flex-shrink: 0;
+        }
+    </style>
+    </th:block>
+</head>
+<body>
+<th:block layout:fragment="content">
+
+    <!-- HERO -->
+    <div class="policy-hero">
+        <div class="container position-relative" style="z-index:2;">
+            <div class="hero-badge"><i class="bi bi-file-earmark-text-fill"></i>Điều khoản sử dụng</div>
+            <h1 class="display-5 fw-bold text-white">
+                Điều khoản &amp; <span class="text-danger">Điều kiện</span>
+            </h1>
+            <p class="text-white-50 mt-2" style="max-width:560px;">
+                Vui lòng đọc kỹ các điều khoản dưới đây trước khi sử dụng dịch vụ của GamingShop.
+                Việc tiếp tục sử dụng đồng nghĩa với việc bạn đã đồng ý với các điều khoản này.
+            </p>
+            <p class="small mt-3" style="color:rgba(255,255,255,.35);">
+                <i class="bi bi-calendar3 me-1"></i>Cập nhật lần cuối: 01/01/2026
+            </p>
+        </div>
+    </div>
+
+    <!-- BREADCRUMB -->
+    <div class="bg-light border-bottom py-2">
+        <div class="container">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 small">
+                    <li class="breadcrumb-item"><a href="/" class="text-decoration-none text-muted">Trang chủ</a></li>
+                    <li class="breadcrumb-item active text-danger">Điều khoản sử dụng</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="container py-5">
+        <div class="row g-5">
+
+            <!-- SIDEBAR -->
+            <div class="col-lg-3">
+                <div class="sticky-top" style="top:80px;">
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-white fw-bold border-0 pt-4 pb-2 px-4">
+                            <i class="bi bi-list-ul text-danger me-2"></i>Chính sách khác
+                        </div>
+                        <div class="card-body p-3">
+                            <div class="list-group policy-nav">
+                                <a href="/shipping" class="list-group-item list-group-item-action">
+                                    <i class="bi bi-truck me-2 text-muted"></i>Vận chuyển
+                                </a>
+                                <a href="/warranty" class="list-group-item list-group-item-action">
+                                    <i class="bi bi-shield-check me-2 text-muted"></i>Bảo hành
+                                </a>
+                                <a href="/return" class="list-group-item list-group-item-action">
+                                    <i class="bi bi-arrow-left-right me-2 text-muted"></i>Đổi trả
+                                </a>
+                                <a href="/privacy" class="list-group-item list-group-item-action">
+                                    <i class="bi bi-lock me-2 text-muted"></i>Bảo mật
+                                </a>
+                                <a href="/terms" class="list-group-item list-group-item-action active">
+                                    <i class="bi bi-file-text me-2"></i>Điều khoản
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body p-4 text-center">
+                            <div class="bg-danger bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                                 style="width:52px;height:52px;">
+                                <i class="bi bi-headset text-danger fs-4"></i>
+                            </div>
+                            <h6 class="fw-bold">Cần hỗ trợ?</h6>
+                            <p class="text-muted small mb-3">Đội ngũ chúng tôi luôn sẵn sàng</p>
+                            <a href="tel:0794612606" class="btn btn-danger w-100 btn-sm fw-bold">
+                                <i class="bi bi-telephone me-1"></i>0794 612 606
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONTENT -->
+            <div class="col-lg-9">
+
+                <!-- 1. Chấp nhận -->
+                <div class="sec-title"><i class="bi bi-1-circle-fill"></i>Chấp nhận điều khoản</div>
+                <div class="terms-card">
+                    <p>Bằng việc truy cập và sử dụng website <strong>gamingshop.vn</strong>, bạn xác nhận đã đọc,
+                    hiểu và đồng ý tuân thủ tất cả các điều khoản và điều kiện được nêu trong tài liệu này.
+                    Nếu bạn không đồng ý, vui lòng không sử dụng dịch vụ của chúng tôi.</p>
+                    <p class="mb-0">GamingShop có quyền thay đổi điều khoản này bất kỳ lúc nào. Thay đổi sẽ có
+                    hiệu lực ngay khi được đăng tải lên website.</p>
+                </div>
+
+                <!-- 2. Tài khoản -->
+                <div class="sec-title"><i class="bi bi-2-circle-fill"></i>Tài khoản người dùng</div>
+                <div class="terms-card">
+                    <h6>Trách nhiệm tài khoản</h6>
+                    <ul class="terms-list">
+                        <li><i class="bi bi-check-circle-fill text-success"></i>Cung cấp thông tin chính xác, đầy đủ khi đăng ký</li>
+                        <li><i class="bi bi-check-circle-fill text-success"></i>Bảo mật mật khẩu và không chia sẻ tài khoản</li>
+                        <li><i class="bi bi-check-circle-fill text-success"></i>Thông báo ngay khi phát hiện tài khoản bị xâm phạm</li>
+                        <li><i class="bi bi-check-circle-fill text-success"></i>Mỗi cá nhân/tổ chức chỉ được lập một tài khoản</li>
+                        <li><i class="bi bi-x-circle-fill text-danger"></i>Không được sử dụng tài khoản vào mục đích bất hợp pháp</li>
+                        <li><i class="bi bi-x-circle-fill text-danger"></i>Không được chuyển nhượng tài khoản cho người khác</li>
+                    </ul>
+                </div>
+
+                <!-- 3. Mua hàng -->
+                <div class="sec-title"><i class="bi bi-3-circle-fill"></i>Đặt hàng và thanh toán</div>
+                <div class="terms-card">
+                    <h6>Quy trình đặt hàng</h6>
+                    <p>Đơn hàng được xác nhận sau khi bạn hoàn tất thanh toán. GamingShop có quyền từ chối
+                    hoặc hủy đơn hàng trong trường hợp:</p>
+                    <ul class="terms-list">
+                        <li><i class="bi bi-exclamation-triangle-fill text-warning"></i>Sản phẩm hết hàng hoặc thông tin giá có sai sót</li>
+                        <li><i class="bi bi-exclamation-triangle-fill text-warning"></i>Phát hiện gian lận hoặc hành vi đáng ngờ</li>
+                        <li><i class="bi bi-exclamation-triangle-fill text-warning"></i>Địa chỉ giao hàng không hợp lệ hoặc không thể liên hệ</li>
+                        <li><i class="bi bi-exclamation-triangle-fill text-warning"></i>Vi phạm các điều khoản sử dụng</li>
+                    </ul>
+                    <div class="alert alert-info border-0 mt-3 mb-0" style="background:rgba(13,110,253,.08);font-size:.85rem;">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Giá sản phẩm hiển thị trên website đã bao gồm VAT. Phí vận chuyển được tính thêm tùy theo địa chỉ.
+                    </div>
+                </div>
+
+                <!-- 4. Sở hữu trí tuệ -->
+                <div class="sec-title"><i class="bi bi-4-circle-fill"></i>Sở hữu trí tuệ</div>
+                <div class="terms-card">
+                    <p>Toàn bộ nội dung trên website bao gồm logo, hình ảnh, văn bản, thiết kế và code
+                    là tài sản của GamingShop và được bảo vệ bởi luật sở hữu trí tuệ Việt Nam.</p>
+                    <ul class="terms-list">
+                        <li><i class="bi bi-x-circle-fill text-danger"></i>Không được sao chép, phân phối nội dung khi chưa có phép</li>
+                        <li><i class="bi bi-x-circle-fill text-danger"></i>Không được sử dụng logo, thương hiệu cho mục đích thương mại</li>
+                        <li><i class="bi bi-check-circle-fill text-success"></i>Được phép chia sẻ link sản phẩm để giới thiệu</li>
+                    </ul>
+                </div>
+
+                <!-- 5. Hành vi cấm -->
+                <div class="sec-title"><i class="bi bi-5-circle-fill"></i>Hành vi bị nghiêm cấm</div>
+                <div class="terms-card">
+                    <div class="warning-box mb-3">
+                        <i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>
+                        <strong>Nghiêm cấm</strong> các hành vi sau. Vi phạm có thể bị khóa tài khoản vĩnh viễn và xử lý pháp lý.
+                    </div>
+                    <ul class="terms-list">
+                        <li><i class="bi bi-x-circle-fill text-danger"></i>Giả mạo thông tin cá nhân hoặc tài khoản người khác</li>
+                        <li><i class="bi bi-x-circle-fill text-danger"></i>Tấn công, phá hoại hệ thống website</li>
+                        <li><i class="bi bi-x-circle-fill text-danger"></i>Đăng nội dung xúc phạm, sai lệch, vi phạm pháp luật</li>
+                        <li><i class="bi bi-x-circle-fill text-danger"></i>Sử dụng bot để mua hàng gian lận hoặc phá hoại</li>
+                        <li><i class="bi bi-x-circle-fill text-danger"></i>Spam đánh giá sản phẩm hoặc hệ thống liên hệ</li>
+                    </ul>
+                </div>
+
+                <!-- 6. Giới hạn trách nhiệm -->
+                <div class="sec-title"><i class="bi bi-6-circle-fill"></i>Giới hạn trách nhiệm</div>
+                <div class="terms-card">
+                    <p>GamingShop không chịu trách nhiệm về các thiệt hại gián tiếp phát sinh từ:</p>
+                    <ul class="terms-list">
+                        <li><i class="bi bi-dash-circle text-muted"></i>Gián đoạn dịch vụ do sự cố kỹ thuật ngoài tầm kiểm soát</li>
+                        <li><i class="bi bi-dash-circle text-muted"></i>Thông tin không chính xác do người dùng cung cấp</li>
+                        <li><i class="bi bi-dash-circle text-muted"></i>Hành vi của bên thứ ba (đơn vị vận chuyển, ngân hàng)</li>
+                        <li><i class="bi bi-dash-circle text-muted"></i>Thiệt hại do vi-rút, phần mềm độc hại từ bên ngoài</li>
+                    </ul>
+                </div>
+
+                <!-- 7. Luật áp dụng -->
+                <div class="sec-title"><i class="bi bi-7-circle-fill"></i>Luật áp dụng và giải quyết tranh chấp</div>
+                <div class="terms-card mb-4">
+                    <p>Các điều khoản này được điều chỉnh bởi <strong>pháp luật Việt Nam</strong>.
+                    Mọi tranh chấp phát sinh sẽ được giải quyết thông qua thương lượng hòa giải trước.
+                    Nếu không thành, tranh chấp sẽ được đưa ra <strong>Tòa án có thẩm quyền tại TP. Đà Nẵng</strong> để giải quyết.</p>
+                </div>
+
+                <!-- Contact -->
+                <div class="contact-box">
+                    <h6 class="fw-bold mb-4 position-relative" style="z-index:1;">
+                        <i class="bi bi-headset text-danger me-2"></i>Liên hệ về điều khoản
+                    </h6>
+                    <div class="c-item">
+                        <div class="c-ico"><i class="bi bi-envelope-fill"></i></div>
+                        <div>
+                            <div class="small" style="color:rgba(255,255,255,.5);">Email</div>
+                            <a href="mailto:tunzadmin@gamingshop.vn" class="text-white fw-bold text-decoration-none">
+                                tunzadmin@gamingshop.vn
+                            </a>
+                        </div>
+                    </div>
+                    <div class="c-item">
+                        <div class="c-ico"><i class="bi bi-telephone-fill"></i></div>
+                        <div>
+                            <div class="small" style="color:rgba(255,255,255,.5);">Hotline</div>
+                            <a href="tel:0794612606" class="text-white fw-bold text-decoration-none">0794 612 606</a>
+                        </div>
+                    </div>
+                    <div class="c-item">
+                        <div class="c-ico"><i class="bi bi-geo-alt-fill"></i></div>
+                        <div>
+                            <div class="small" style="color:rgba(255,255,255,.5);">Địa chỉ</div>
+                            <span class="text-white fw-bold">88 Nguyễn Viết Xuân, P. Liên Chiểu, TP. Đà Nẵng</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</th:block>
+</body>
+</html>

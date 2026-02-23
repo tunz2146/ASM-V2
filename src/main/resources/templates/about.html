@@ -3,122 +3,490 @@
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/base}">
-<head><title>Về chúng tôi</title></head>
+<head>
+    <title>Về chúng tôi - Gaming Shop</title>
+    <th:block layout:fragment="css">
+    <style>
+        /* ===== HERO ===== */
+        .about-hero {
+            background: linear-gradient(135deg, #0d1117 0%, #1a0a0a 50%, #0d1117 100%);
+            padding: 64px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .about-hero::before {
+            content: '';
+            position: absolute;
+            top: -100px; right: -100px;
+            width: 420px; height: 420px;
+            background: radial-gradient(circle, rgba(220,53,69,.13) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        .about-hero::after {
+            content: '';
+            position: absolute;
+            bottom: -80px; left: -80px;
+            width: 280px; height: 280px;
+            background: radial-gradient(circle, rgba(220,53,69,.07) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(220,53,69,.15);
+            border: 1px solid rgba(220,53,69,.3);
+            color: #ff6b7a;
+            padding: 6px 18px;
+            border-radius: 50px;
+            font-size: .84rem;
+            font-weight: 500;
+            margin-bottom: 16px;
+        }
+
+        /* ===== STAT CARDS ===== */
+        .stat-card {
+            background: #fff;
+            border-radius: 14px;
+            border: 1px solid #f0f0f0;
+            padding: 22px 16px;
+            text-align: center;
+            transition: all .3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #dc3545, #c82333);
+            transform: scaleX(0);
+            transition: transform .3s ease;
+        }
+        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 12px 30px rgba(220,53,69,.12); }
+        .stat-card:hover::before { transform: scaleX(1); }
+        .stat-num   { font-size: 2rem; font-weight: 800; color: #dc3545; line-height: 1; margin-bottom: 4px; }
+        .stat-label { font-size: .82rem; color: #888; font-weight: 500; }
+
+        /* ===== STORY ===== */
+        .story-section { padding: 70px 0; background: #fff; }
+        .story-img-card {
+            background: linear-gradient(135deg, #fff, #fafafa);
+            border-radius: 20px;
+            padding: 40px 32px;
+            box-shadow: 0 8px 40px rgba(0,0,0,.08);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .story-img-card::before {
+            content: '';
+            position: absolute;
+            top: -60px; right: -60px;
+            width: 200px; height: 200px;
+            background: rgba(220,53,69,.05);
+            border-radius: 50%;
+        }
+        .story-award-ico {
+            width: 100px; height: 100px;
+            background: linear-gradient(135deg, #fff5f5, #ffe5e7);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: 0 4px 20px rgba(220,53,69,.2);
+        }
+
+        /* ===== BRANDS ===== */
+        .brands-section { padding: 60px 0; background: #f8f9fa; }
+        .brand-card {
+            background: #fff;
+            border-radius: 14px;
+            border: 1px solid #f0f0f0;
+            padding: 28px 20px;
+            text-align: center;
+            transition: all .3s ease;
+        }
+        .brand-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 10px 30px rgba(220,53,69,.12);
+            border-color: rgba(220,53,69,.2);
+        }
+        .brand-ico {
+            width: 60px; height: 60px;
+            background: linear-gradient(135deg, #fff5f5, #ffe5e7);
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 14px;
+            font-size: 1.6rem; color: #dc3545;
+            transition: transform .3s;
+        }
+        .brand-card:hover .brand-ico { transform: scale(1.1) rotate(5deg); }
+        .brand-name { font-weight: 700; color: #1a1a2e; margin-bottom: 4px; }
+        .brand-sub  { font-size: .78rem; color: #aaa; }
+
+        /* ===== WHY US ===== */
+        .why-section { padding: 60px 0; background: #fff; }
+        .why-card {
+            background: linear-gradient(135deg, #fff5f5, #fff0f0);
+            border: 1px solid #ffd6d6;
+            border-radius: 14px;
+            padding: 24px 20px;
+            height: 100%;
+            transition: all .3s ease;
+        }
+        .why-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(220,53,69,.1); }
+        .why-ico {
+            width: 50px; height: 50px;
+            background: rgba(220,53,69,.12);
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem; color: #dc3545;
+            margin-bottom: 14px;
+        }
+        .why-card h6 { font-weight: 700; color: #1a1a2e; margin-bottom: 8px; }
+        .why-card p  { color: #666; font-size: .86rem; line-height: 1.6; margin: 0; }
+
+        /* ===== CONTACT ===== */
+        .contact-section { padding: 60px 0; background: #f8f9fa; }
+        .contact-card {
+            background: #fff;
+            border-radius: 16px;
+            border: 1px solid #f0f0f0;
+            padding: 30px 24px;
+            text-align: center;
+            height: 100%;
+            transition: all .3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .contact-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #dc3545, #c82333);
+            transform: scaleX(0);
+            transition: transform .3s ease;
+        }
+        .contact-card:hover { transform: translateY(-5px); box-shadow: 0 12px 32px rgba(220,53,69,.1); }
+        .contact-card:hover::after { transform: scaleX(1); }
+        .c-ico {
+            width: 64px; height: 64px;
+            background: linear-gradient(135deg, #fff5f5, #ffe5e7);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.6rem; color: #dc3545;
+            margin: 0 auto 16px;
+            transition: transform .3s;
+        }
+        .contact-card:hover .c-ico { transform: scale(1.1); }
+        .contact-card h6 { font-weight: 700; color: #1a1a2e; margin-bottom: 8px; }
+        .contact-card a  { color: #dc3545; text-decoration: none; font-weight: 600; }
+        .contact-card a:hover { text-decoration: underline; }
+        .contact-card p  { color: #666; font-size: .86rem; margin: 0; line-height: 1.6; }
+
+        /* ===== CTA DARK ===== */
+        .cta-section {
+            background: linear-gradient(135deg, #0d1117, #1a1a2e);
+            padding: 60px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: -80px; right: -80px;
+            width: 350px; height: 350px;
+            background: radial-gradient(circle, rgba(220,53,69,.12) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+    </style>
+    </th:block>
+</head>
 <body>
-<div layout:fragment="content">
+<th:block layout:fragment="content">
 
-    <!-- Hero -->
-    <div class="bg-dark text-white py-5">
-        <div class="container text-center">
-            <h1 class="display-5 fw-bold">
-                <i class="bi bi-controller text-danger me-2"></i>
-                VỀ GAMING<span class="text-danger">SHOP</span>
+    <!-- ===== HERO ===== -->
+    <div class="about-hero">
+        <div class="container position-relative text-center" style="z-index:2;">
+            <div class="hero-badge">
+                <i class="bi bi-controller"></i>Về GamingShop
+            </div>
+            <h1 class="display-4 fw-bold text-white">
+                Người bạn đồng hành của<br>
+                mọi <span class="text-danger">game thủ Việt</span>
             </h1>
-            <p class="lead text-white-50 mt-3">
-                Người bạn đồng hành của mọi game thủ Việt từ năm 2020
+            <p class="lead text-white-50 mt-3" style="max-width:560px; margin:0 auto;">
+                Từ năm 2020, GamingShop tự hào là địa chỉ tin cậy cung cấp thiết bị
+                gaming chính hãng, chất lượng cao với giá tốt nhất thị trường.
             </p>
+
+            <!-- Stat cards -->
+            <div class="row g-3 mt-5 justify-content-center">
+                <div class="col-6 col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-num">5+</div>
+                        <div class="stat-label">Năm kinh nghiệm</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-num">50K+</div>
+                        <div class="stat-label">Khách hàng tin tưởng</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-num">500+</div>
+                        <div class="stat-label">Sản phẩm đa dạng</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-num">4.9★</div>
+                        <div class="stat-label">Đánh giá trung bình</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="container py-5">
-
-        <!-- Câu chuyện -->
-        <div class="row align-items-center mb-5">
-            <div class="col-lg-6">
-                <h2 class="fw-bold mb-3">Câu chuyện của chúng tôi</h2>
-                <p class="text-muted">
-                    GamingShop ra đời từ niềm đam mê gaming và mong muốn mang đến
-                    cho cộng đồng game thủ Việt Nam những thiết bị chất lượng cao
-                    với mức giá hợp lý nhất.
-                </p>
-                <p class="text-muted">
-                    Chúng tôi là đối tác chính thức của Logitech, Razer, Corsair,
-                    HyperX tại Việt Nam, đảm bảo 100% hàng chính hãng, bảo hành
-                    đầy đủ theo tiêu chuẩn quốc tế.
-                </p>
-                <div class="row g-3 mt-3">
-                    <div class="col-6">
-                        <div class="card border-0 bg-light text-center p-3">
-                            <div class="fs-2 fw-bold text-danger">5+</div>
-                            <div class="small text-muted">Năm kinh nghiệm</div>
+    <!-- ===== CÂU CHUYỆN ===== -->
+    <section class="story-section">
+        <div class="container">
+            <div class="row align-items-center g-5">
+                <!-- Left: text -->
+                <div class="col-lg-6">
+                    <span class="badge bg-danger bg-opacity-10 text-danger fw-semibold px-3 py-2 mb-3 rounded-pill">
+                        <i class="bi bi-book-fill me-1"></i>Câu chuyện của chúng tôi
+                    </span>
+                    <h2 class="fw-bold mb-3" style="color:#1a1a2e;">
+                        Đam mê gaming,<br>tạo nên <span class="text-danger">GamingShop</span>
+                    </h2>
+                    <p class="text-muted mb-3" style="line-height:1.8;">
+                        GamingShop ra đời từ niềm đam mê gaming và mong muốn mang đến cho cộng đồng
+                        game thủ Việt Nam những thiết bị chất lượng cao với mức giá hợp lý nhất.
+                        Chúng tôi hiểu rằng một chiếc chuột tốt hay bàn phím cơ đúng chuẩn
+                        có thể thay đổi hoàn toàn trải nghiệm chơi game của bạn.
+                    </p>
+                    <p class="text-muted mb-4" style="line-height:1.8;">
+                        Là đối tác chính thức của <strong>Logitech, Razer, Corsair, HyperX</strong> tại Việt Nam,
+                        chúng tôi đảm bảo 100% hàng chính hãng với bảo hành đầy đủ theo tiêu chuẩn quốc tế.
+                    </p>
+                    <div class="d-flex flex-wrap gap-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-check-circle-fill text-success"></i>
+                            <span class="small fw-semibold">Hàng chính hãng 100%</span>
                         </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="card border-0 bg-light text-center p-3">
-                            <div class="fs-2 fw-bold text-danger">50K+</div>
-                            <div class="small text-muted">Khách hàng tin tưởng</div>
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-check-circle-fill text-success"></i>
+                            <span class="small fw-semibold">Bảo hành 12-24 tháng</span>
                         </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="card border-0 bg-light text-center p-3">
-                            <div class="fs-2 fw-bold text-danger">500+</div>
-                            <div class="small text-muted">Sản phẩm đa dạng</div>
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-check-circle-fill text-success"></i>
+                            <span class="small fw-semibold">Hỗ trợ 24/7</span>
                         </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="card border-0 bg-light text-center p-3">
-                            <div class="fs-2 fw-bold text-danger">4.9⭐</div>
-                            <div class="small text-muted">Đánh giá trung bình</div>
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-check-circle-fill text-success"></i>
+                            <span class="small fw-semibold">Đổi trả 7 ngày</span>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-lg-6 text-center mt-4 mt-lg-0">
-                <div class="position-relative d-inline-block">
-                    <i class="bi bi-controller" style="font-size:180px;color:#dc3545;opacity:.15;
-                       position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);"></i>
-                    <div class="card border-0 shadow-lg p-5" style="position:relative;z-index:2;">
-                        <i class="bi bi-award-fill text-danger" style="font-size:80px;"></i>
-                        <h4 class="fw-bold mt-3">Cam kết của chúng tôi</h4>
-                        <p class="text-muted small">Hàng chính hãng 100% · Bảo hành uy tín · Hỗ trợ 24/7</p>
+
+                <!-- Right: award card -->
+                <div class="col-lg-6 d-flex justify-content-center">
+                    <div class="story-img-card" style="max-width:340px; width:100%;">
+                        <div class="story-award-ico">
+                            <i class="bi bi-award-fill text-danger" style="font-size:3rem;"></i>
+                        </div>
+                        <h4 class="fw-bold mb-2" style="color:#1a1a2e;">Cam kết của chúng tôi</h4>
+                        <p class="text-muted small mb-4">
+                            Không chỉ bán sản phẩm — chúng tôi xây dựng trải nghiệm gaming
+                            hoàn hảo cho từng khách hàng.
+                        </p>
+                        <div class="d-flex flex-column gap-2">
+                            <div class="d-flex align-items-center gap-3 p-2 rounded-3" style="background:#fff5f5;">
+                                <i class="bi bi-shield-check-fill text-danger"></i>
+                                <span class="small fw-semibold">Chính hãng · Kiểm định kỹ lưỡng</span>
+                            </div>
+                            <div class="d-flex align-items-center gap-3 p-2 rounded-3" style="background:#fff5f5;">
+                                <i class="bi bi-headset text-danger"></i>
+                                <span class="small fw-semibold">Tư vấn nhiệt tình · Hậu mãi chu đáo</span>
+                            </div>
+                            <div class="d-flex align-items-center gap-3 p-2 rounded-3" style="background:#fff5f5;">
+                                <i class="bi bi-truck text-danger"></i>
+                                <span class="small fw-semibold">Giao hàng toàn quốc · Đóng gói cẩn thận</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+    </section>
 
-        <!-- Thương hiệu đối tác -->
-        <div class="text-center mb-5">
-            <h3 class="fw-bold mb-4">Thương hiệu chúng tôi phân phối</h3>
+    <!-- ===== THƯƠNG HIỆU ===== -->
+    <section class="brands-section">
+        <div class="container">
+            <div class="text-center mb-5">
+                <span class="badge bg-danger bg-opacity-10 text-danger fw-semibold px-3 py-2 mb-3 rounded-pill">
+                    <i class="bi bi-tags-fill me-1"></i>Đối tác thương hiệu
+                </span>
+                <h2 class="fw-bold" style="color:#1a1a2e;">Thương hiệu chúng tôi phân phối</h2>
+                <p class="text-muted">Đại lý chính thức của các thương hiệu gaming hàng đầu thế giới</p>
+            </div>
             <div class="row g-4 justify-content-center">
-                <div class="col-6 col-md-3" th:each="brand : ${ {'Logitech','Razer','Corsair','HyperX'} }">
-                    <div class="card border-0 shadow-sm p-4 text-center hover-card" style="transition:.3s;">
-                        <i class="bi bi-controller text-danger mb-2" style="font-size:2rem;"></i>
-                        <div class="fw-bold" th:text="${brand}">Brand</div>
+                <div class="col-6 col-md-3">
+                    <div class="brand-card">
+                        <div class="brand-ico"><i class="bi bi-mouse-fill"></i></div>
+                        <div class="brand-name">Logitech</div>
+                        <div class="brand-sub">Chuột · Bàn phím · Tai nghe</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="brand-card">
+                        <div class="brand-ico"><i class="bi bi-lightning-fill"></i></div>
+                        <div class="brand-name">Razer</div>
+                        <div class="brand-sub">Gaming · RGB · Performance</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="brand-card">
+                        <div class="brand-ico"><i class="bi bi-cpu-fill"></i></div>
+                        <div class="brand-name">Corsair</div>
+                        <div class="brand-sub">Premium · Mechanical · Pro</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="brand-card">
+                        <div class="brand-ico"><i class="bi bi-headphones"></i></div>
+                        <div class="brand-name">HyperX</div>
+                        <div class="brand-sub">Tai nghe · Bàn phím · Cloud</div>
                     </div>
                 </div>
             </div>
         </div>
+    </section>
 
-        <!-- Đội ngũ -->
-        <div class="text-center">
-            <h3 class="fw-bold mb-4">Liên hệ với chúng tôi</h3>
+    <!-- ===== TẠI SAO CHỌN CHÚNG TÔI ===== -->
+    <section class="why-section">
+        <div class="container">
+            <div class="text-center mb-5">
+                <span class="badge bg-danger bg-opacity-10 text-danger fw-semibold px-3 py-2 mb-3 rounded-pill">
+                    <i class="bi bi-star-fill me-1"></i>Điểm nổi bật
+                </span>
+                <h2 class="fw-bold" style="color:#1a1a2e;">Tại sao chọn GamingShop?</h2>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="why-card">
+                        <div class="why-ico"><i class="bi bi-shield-check-fill"></i></div>
+                        <h6>Hàng chính hãng 100%</h6>
+                        <p>Tem nhãn, hóa đơn VAT, bảo hành chính hãng từ nhà sản xuất đầy đủ.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="why-card">
+                        <div class="why-ico"><i class="bi bi-currency-exchange"></i></div>
+                        <h6>Giá cạnh tranh nhất</h6>
+                        <p>Cam kết giá tốt nhất thị trường. Nếu tìm được nơi rẻ hơn, chúng tôi đàm phán lại.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="why-card">
+                        <div class="why-ico"><i class="bi bi-truck-front-fill"></i></div>
+                        <h6>Giao hàng siêu tốc</h6>
+                        <p>Nội thành Đà Nẵng giao trong ngày. Toàn quốc 1-5 ngày qua GHTK, GHN, J&T.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="why-card">
+                        <div class="why-ico"><i class="bi bi-headset"></i></div>
+                        <h6>Tư vấn tận tình 24/7</h6>
+                        <p>Đội ngũ game thủ am hiểu sản phẩm, sẵn sàng hỗ trợ bạn chọn đúng thiết bị.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="why-card">
+                        <div class="why-ico"><i class="bi bi-arrow-repeat"></i></div>
+                        <h6>Đổi trả dễ dàng</h6>
+                        <p>7 ngày đổi trả không cần lý do với sản phẩm lỗi. Miễn phí ship đổi trả toàn quốc.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="why-card">
+                        <div class="why-ico"><i class="bi bi-gift-fill"></i></div>
+                        <h6>Ưu đãi thành viên</h6>
+                        <p>Tích điểm mỗi đơn hàng, voucher sinh nhật, ưu đãi độc quyền khách hàng thân thiết.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== LIÊN HỆ — THÔNG TIN MỚI ===== -->
+    <section class="contact-section">
+        <div class="container">
+            <div class="text-center mb-5">
+                <span class="badge bg-danger bg-opacity-10 text-danger fw-semibold px-3 py-2 mb-3 rounded-pill">
+                    <i class="bi bi-envelope-fill me-1"></i>Liên hệ
+                </span>
+                <h2 class="fw-bold" style="color:#1a1a2e;">Liên hệ với chúng tôi</h2>
+                <p class="text-muted">Luôn sẵn sàng lắng nghe và hỗ trợ bạn</p>
+            </div>
             <div class="row g-4 justify-content-center">
+                <!-- Địa chỉ MỚI -->
                 <div class="col-md-4">
-                    <div class="card border-0 shadow-sm p-4 text-center">
-                        <i class="bi bi-geo-alt-fill text-danger fs-1 mb-3"></i>
-                        <h6 class="fw-bold">Địa chỉ</h6>
-                        <p class="text-muted small mb-0">123 Nguyễn Huệ, Q.1, TP.HCM</p>
+                    <div class="contact-card">
+                        <div class="c-ico"><i class="bi bi-geo-alt-fill"></i></div>
+                        <h6>Địa chỉ</h6>
+                        <p>88 Nguyễn Viết Xuân<br>P. Liên Chiểu, TP. Đà Nẵng</p>
                     </div>
                 </div>
+                <!-- SĐT MỚI -->
                 <div class="col-md-4">
-                    <div class="card border-0 shadow-sm p-4 text-center">
-                        <i class="bi bi-telephone-fill text-danger fs-1 mb-3"></i>
-                        <h6 class="fw-bold">Hotline</h6>
-                        <p class="text-muted small mb-0">0987 654 321</p>
-                        <p class="text-muted small">Mở cửa: 8:00 - 22:00</p>
+                    <div class="contact-card">
+                        <div class="c-ico"><i class="bi bi-telephone-fill"></i></div>
+                        <h6>Hotline</h6>
+                        <p><a href="tel:0794612606">0794 612 606</a></p>
+                        <p class="text-muted small">Mở cửa: 8:00 - 22:00 hàng ngày</p>
                     </div>
                 </div>
+                <!-- Email MỚI -->
                 <div class="col-md-4">
-                    <div class="card border-0 shadow-sm p-4 text-center">
-                        <i class="bi bi-envelope-fill text-danger fs-1 mb-3"></i>
-                        <h6 class="fw-bold">Email</h6>
-                        <p class="text-muted small mb-0">support@gamingshop.vn</p>
+                    <div class="contact-card">
+                        <div class="c-ico"><i class="bi bi-envelope-fill"></i></div>
+                        <h6>Email</h6>
+                        <p><a href="mailto:tunzadmin@gamingshop.vn">tunzadmin@gamingshop.vn</a></p>
+                        <p class="text-muted small">Phản hồi trong vòng 24 giờ</p>
                     </div>
                 </div>
             </div>
         </div>
+    </section>
 
-    </div>
-</div>
+    <!-- ===== CTA ===== -->
+    <section class="cta-section">
+        <div class="container text-center position-relative" style="z-index:1;">
+            <h2 class="fw-bold text-white mb-3">
+                Sẵn sàng nâng cấp setup của bạn?
+            </h2>
+            <p class="text-white-50 mb-4" style="max-width:480px; margin:0 auto 24px;">
+                Khám phá hàng trăm sản phẩm gaming chính hãng với giá tốt nhất
+            </p>
+            <div class="d-flex flex-wrap gap-3 justify-content-center">
+                <a href="/products" class="btn btn-danger btn-lg px-5 rounded-pill fw-bold">
+                    <i class="bi bi-shop me-2"></i>Mua sắm ngay
+                </a>
+                <a href="tel:0794612606" class="btn btn-outline-light btn-lg px-5 rounded-pill fw-bold">
+                    <i class="bi bi-telephone me-2"></i>0794 612 606
+                </a>
+            </div>
+        </div>
+    </section>
+
+</th:block>
 </body>
 </html>

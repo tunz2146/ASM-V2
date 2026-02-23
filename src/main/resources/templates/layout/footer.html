@@ -2,11 +2,10 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head></head>
 <body>
-    <!-- Footer Fragment -->
     <footer th:fragment="footer" class="gaming-footer bg-dark text-white pt-5 pb-3">
         <div class="container">
-            <!-- Main Footer Content -->
             <div class="row g-4 mb-4">
+
                 <!-- Company Info -->
                 <div class="col-lg-4 col-md-6">
                     <div class="footer-brand mb-3">
@@ -16,100 +15,64 @@
                         </h3>
                     </div>
                     <p class="text-muted">
-                        Chuyên cung cấp thiết bị gaming chính hãng, chất lượng cao với giá tốt nhất thị trường. 
+                        Chuyên cung cấp thiết bị gaming chính hãng, chất lượng cao với giá tốt nhất thị trường.
                         Đồng hành cùng game thủ Việt!
                     </p>
                     <div class="social-links mt-3">
                         <h6 class="mb-3">Kết nối với chúng tôi</h6>
                         <div class="d-flex gap-2">
-                            <a href="#" class="btn btn-outline-light btn-sm rounded-circle">
-                                <i class="bi bi-facebook"></i>
-                            </a>
-                            <a href="#" class="btn btn-outline-light btn-sm rounded-circle">
-                                <i class="bi bi-instagram"></i>
-                            </a>
-                            <a href="#" class="btn btn-outline-light btn-sm rounded-circle">
-                                <i class="bi bi-youtube"></i>
-                            </a>
-                            <a href="#" class="btn btn-outline-light btn-sm rounded-circle">
-                                <i class="bi bi-discord"></i>
-                            </a>
-                            <a href="#" class="btn btn-outline-light btn-sm rounded-circle">
-                                <i class="bi bi-tiktok"></i>
-                            </a>
+                            <a href="#" class="btn btn-outline-light btn-sm rounded-circle"><i class="bi bi-facebook"></i></a>
+                            <a href="#" class="btn btn-outline-light btn-sm rounded-circle"><i class="bi bi-instagram"></i></a>
+                            <a href="#" class="btn btn-outline-light btn-sm rounded-circle"><i class="bi bi-youtube"></i></a>
+                            <a href="#" class="btn btn-outline-light btn-sm rounded-circle"><i class="bi bi-discord"></i></a>
+                            <a href="#" class="btn btn-outline-light btn-sm rounded-circle"><i class="bi bi-tiktok"></i></a>
                         </div>
                     </div>
                 </div>
-                
-                <!-- Quick Links -->
+
+                <!-- Danh mục -->
                 <div class="col-lg-2 col-md-6">
                     <h5 class="mb-3 text-danger">Danh mục</h5>
                     <ul class="list-unstyled footer-links">
-                        <li><a href="/products?category=mouse">
-                            <i class="bi bi-chevron-right"></i> Chuột Gaming
-                        </a></li>
-                        <li><a href="/products?category=keyboard">
-                            <i class="bi bi-chevron-right"></i> Bàn phím Gaming
-                        </a></li>
-                        <li><a href="/products?category=headset">
-                            <i class="bi bi-chevron-right"></i> Tai nghe Gaming
-                        </a></li>
-                        <li><a href="/products?category=mousepad">
-                            <i class="bi bi-chevron-right"></i> Mousepad
-                        </a></li>
-                        <li><a href="/deals" class="text-warning">
-                            <i class="bi bi-chevron-right"></i> Khuyến mãi
-                        </a></li>
+                        <li><a href="/products?category=chuot-gaming"><i class="bi bi-chevron-right"></i> Chuột Gaming</a></li>
+                        <li><a href="/products?category=ban-phim-gaming"><i class="bi bi-chevron-right"></i> Bàn phím Gaming</a></li>
+                        <li><a href="/products?category=tai-nghe-gaming"><i class="bi bi-chevron-right"></i> Tai nghe Gaming</a></li>
+                        <li><a href="/products?category=mousepad"><i class="bi bi-chevron-right"></i> Mousepad</a></li>
+                        <li><a href="/deals" class="text-warning"><i class="bi bi-chevron-right"></i> Khuyến mãi</a></li>
                     </ul>
                 </div>
-                
-                <!-- Support -->
+
+                <!-- Hỗ trợ -->
                 <div class="col-lg-3 col-md-6">
                     <h5 class="mb-3 text-danger">Hỗ trợ</h5>
                     <ul class="list-unstyled footer-links">
-                        <li><a href="/about">
-                            <i class="bi bi-chevron-right"></i> Về chúng tôi
-                        </a></li>
-                        <li><a href="/shipping">
-                            <i class="bi bi-chevron-right"></i> Chính sách vận chuyển
-                        </a></li>
-                        <li><a href="/warranty">
-                            <i class="bi bi-chevron-right"></i> Chính sách bảo hành
-                        </a></li>
-                        <li><a href="/return">
-                            <i class="bi bi-chevron-right"></i> Đổi trả sản phẩm
-                        </a></li>
-                        <li><a href="/privacy">
-                            <i class="bi bi-chevron-right"></i> Chính sách bảo mật
-                        </a></li>
-                        <li><a href="/terms">
-                            <i class="bi bi-chevron-right"></i> Điều khoản sử dụng
-                        </a></li>
+                        <li><a href="/about"><i class="bi bi-chevron-right"></i> Về chúng tôi</a></li>
+                        <li><a href="/shipping"><i class="bi bi-chevron-right"></i> Chính sách vận chuyển</a></li>
+                        <li><a href="/warranty"><i class="bi bi-chevron-right"></i> Chính sách bảo hành</a></li>
+                        <li><a href="/return"><i class="bi bi-chevron-right"></i> Đổi trả sản phẩm</a></li>
+                        <li><a href="/privacy"><i class="bi bi-chevron-right"></i> Chính sách bảo mật</a></li>
+                        <li><a href="/terms"><i class="bi bi-chevron-right"></i> Điều khoản sử dụng</a></li>
                     </ul>
                 </div>
-                
-                <!-- Contact Info -->
+
+                <!-- ⭐ Liên hệ - CẬP NHẬT THÔNG TIN MỚI -->
                 <div class="col-lg-3 col-md-6">
                     <h5 class="mb-3 text-danger">Liên hệ</h5>
                     <ul class="list-unstyled contact-info">
                         <li class="mb-3">
                             <i class="bi bi-geo-alt-fill text-danger"></i>
-                            <span class="ms-2">123 Nguyễn Huệ, Q.1,<br> TP. Hồ Chí Minh</span>
+                            <span class="ms-2">88 Nguyễn Viết Xuân,<br>P. Liên Chiểu, TP. Đà Nẵng</span>
                         </li>
                         <li class="mb-3">
                             <i class="bi bi-telephone-fill text-danger"></i>
                             <span class="ms-2">
-                                <a href="tel:0987654321" class="text-white text-decoration-none">
-                                    0987 654 321
-                                </a>
+                                <a href="tel:0794612606" class="text-white text-decoration-none">0794 612 606</a>
                             </span>
                         </li>
                         <li class="mb-3">
                             <i class="bi bi-envelope-fill text-danger"></i>
                             <span class="ms-2">
-                                <a href="mailto:support@gamingshop.vn" class="text-white text-decoration-none">
-                                    support@gamingshop.vn
-                                </a>
+                                <a href="mailto:tunzadmin@gamingshop.vn" class="text-white text-decoration-none">tunzadmin@gamingshop.vn</a>
                             </span>
                         </li>
                         <li>
@@ -119,38 +82,51 @@
                     </ul>
                 </div>
             </div>
-            
-            <!-- Payment Methods -->
+
+            <!-- ⭐ Thanh toán & Vận chuyển - CHỈ GIỮ THANH TOÁN NGÂN HÀNG -->
             <div class="row border-top border-secondary pt-4 mb-4">
                 <div class="col-md-6 mb-3 mb-md-0">
                     <h6 class="mb-3">Phương thức thanh toán</h6>
-                    <div class="payment-methods d-flex flex-wrap gap-2">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/4/41/Visa_Logo.png" 
-                             alt="Visa" class="payment-icon">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" 
-                             alt="Mastercard" class="payment-icon">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/American_Express_logo_%282018%29.svg" 
-                             alt="American Express" class="payment-icon">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" 
-                             alt="PayPal" class="payment-icon">
+                    <div class="d-flex align-items-center gap-3">
+                        <!-- Chỉ hiển thị thanh toán ngân hàng -->
+                        <div class="payment-bank-badge d-flex align-items-center gap-2 px-3 py-2 rounded"
+                             style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15);">
+                            <i class="bi bi-bank2 text-danger fs-5"></i>
+                            <div>
+                                <div class="small fw-bold text-white">Chuyển khoản ngân hàng</div>
+                                <div style="font-size:0.72rem; color:#aaa;">MBBank · VietQR · Napas 247</div>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2 align-items-center">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/MBBank_logo.svg/200px-MBBank_logo.svg.png"
+                                 alt="MBBank"
+                                 style="height:24px; filter:brightness(0) invert(1); opacity:0.8;"
+                                 onerror="this.style.display='none'">
+                            <span class="badge bg-secondary small" style="font-size:.65rem;">VietQR</span>
+                            <span class="badge bg-secondary small" style="font-size:.65rem;">Napas 247</span>
+                        </div>
                     </div>
+                    <p class="text-muted mt-2 mb-0" style="font-size:0.78rem;">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Quét mã QR để thanh toán nhanh chóng và an toàn
+                    </p>
                 </div>
                 <div class="col-md-6">
                     <h6 class="mb-3">Đối tác vận chuyển</h6>
                     <div class="shipping-partners d-flex flex-wrap gap-2">
                         <span class="badge bg-secondary">GHTK</span>
                         <span class="badge bg-secondary">GHN</span>
-                        <span class="badge bg-secondary">J&T Express</span>
+                        <span class="badge bg-secondary">J&amp;T Express</span>
                         <span class="badge bg-secondary">VNPost</span>
                     </div>
                 </div>
             </div>
-            
-            <!-- Bottom Footer -->
+
+            <!-- Bottom -->
             <div class="row border-top border-secondary pt-3">
                 <div class="col-md-6 text-center text-md-start">
                     <p class="mb-0 text-muted small">
-                        &copy; 2026 <span class="text-danger">GamingShop</span>. 
+                        &copy; 2026 <span class="text-danger">GamingShop</span>.
                         All rights reserved. Made with <i class="bi bi-heart-fill text-danger"></i> in Vietnam
                     </p>
                 </div>
@@ -161,8 +137,7 @@
                 </div>
             </div>
         </div>
-        
-        <!-- Back to Top Button -->
+
         <button id="backToTop" class="btn btn-danger back-to-top" title="Lên đầu trang">
             <i class="bi bi-arrow-up-short"></i>
         </button>
