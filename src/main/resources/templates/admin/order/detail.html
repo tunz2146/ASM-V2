@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title th:text="${'Đơn hàng #GS-' + order.id}">Chi tiết đơn hàng</title>
+    <th:block layout:fragment="css">
+    <style>
+        :root { --red:#dc3545; --dark2:#1a1a2e; }
+
+        .od-hero {
+            background: linear-gradient(135deg, var(--dark2), #0d1117);
+            padding: 28px 0; margin-bottom: 28px;
+        }
+        .od-hero .order-code { font-size: 1.6rem; font-weight: 900; color: #fff; }
+        .od-hero .order-date { color: rgba(255,255,255,.5); font-size: .85rem; }
+
+        /* STATUS STEPPER */
+        .stepper { display: flex; align-items: center; gap: 0; overflow-x: auto; padding: 4px 0; }
+        .step {
+            display: flex; flex-direction: column; align-items: center;
+            flex: 1; min-width: 80px; position: relative;
+        }
+        .step:not(:last-child)::after {
+            content: '';
+            position: absolute; top: 18px; left: 60%; right: -40%;
+            height: 3px; background: #e0e0e0; z-index: 0;
+        }
+        .step.done:not(:last-child)::after { background: #28a745; }
+        .step-circle {
+            width: 38px; height: 38px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem; font-weight: 700; z-index: 1;
+            border: 3px solid #e0e0e0; background: #fff; color: #ccc;
+            transition: all .3s;
+        }
+        .step.done  .step-circle { background: #28a745; border-color: #28a745; color: #fff; }
+        .step.active .step-circle { background: var(--red); border-color: var(--red); color: #fff; box-shadow: 0 0 0 5px rgba(220,53,69,.15); }
+        .step.cancelled .step-circle { background: #dc3545; border-color: #dc3545; color: #fff; }
+        .step-label { font-size: .72rem; font-weight: 600; color: #999; margin-top: 7px; text-align: center; }
+        .step.done   .step-label { color: #28a745; }
+        .step.active .step-label { color: var(--red); }
+
+        /* INFO CARDS */
+        .info-card {
+            border: 1px solid #f0f0f0; border-radius: 14px;
+            padding: 22px; height: 100%;
+        }
+        .info-card .ic-title {
+            font-size: .78rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: .6px; color: #bbb; margin-bottom: 14px;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .info-row { display: flex; gap: 10px; margin-bottom: 10px; }
+        .info-row .ir-label { color: #999; font-size: .82rem; min-width: 100px; flex-shrink: 0; }
+        .info-row .ir-val   { font-size: .88rem; font-weight: 600; color: var(--dark2); }
+
+        /* PRODUCT TABLE */
+        .prod-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+        .prod-table thead th {
+            background: #f8f9fa; padding: 10px 16px;
+            font-size: .78rem; font-weight: 700; color: #999;
+            text-transform: uppercase; letter-spacing: .5px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        .prod-table tbody td {
+            padding: 14px 16px; border-bottom: 1px solid #f5f5f5;
+            font-size: .88rem; vertical-align: middle;
+        }
+        .prod-table tbody tr:last-child td { border-bottom: none; }
+        .prod-img {
+            width: 56px; height: 56px; border-radius: 10px;
+            object-fit: contain; background: #f8f9fa;
+            border: 1px solid #f0f0f0; padding: 4px;
+        }
+        .prod-name { font-weight: 600; color: var(--dark2); font-size: .88rem; }
+
+        /* TOTAL TABLE */
+        .total-row { display: flex; justify-content: space-between; padding: 8px 0; }
+        .total-row:not(:last-child) { border-bottom: 1px solid #f5f5f5; }
+        .total-row.grand { border-top: 2px solid #f0f0f0; padding-top: 14px; margin-top: 4px; }
+        .total-row .tr-label { color: #888; font-size: .88rem; }
+        .total-row .tr-val   { font-weight: 700; color: var(--dark2); }
+        .total-row.grand .tr-val { font-size: 1.3rem; color: var(--red); }
+
+        /* STATUS BADGE */
+        .status-badge {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 6px 16px; border-radius: 50px;
+            font-size: .82rem; font-weight: 700;
+        }
+        .status-CHO_XAC_NHAN { background: #fff8e1; color: #f57c00; }
+        .status-DA_XAC_NHAN  { background: #e3f2fd; color: #1565c0; }
+        .status-DANG_GIAO    { background: #e0f7fa; color: #00838f; }
+        .status-DA_GIAO      { background: #e8f5e9; color: #2e7d32; }
+        .status-DA_HUY       { background: #fce4ec; color: #c62828; }
+
+        /* ACTION BUTTONS */
+        .status-select-lg {
+            border: 2px solid #e0e0e0; border-radius: 10px;
+            padding: 9px 14px; font-size: .9rem; font-weight: 600;
+            background: #fff; cursor: pointer; outline: none;
+            transition: border-color .2s;
+        }
+        .status-select-lg:focus { border-color: var(--red); }
+        .btn-update {
+            background: linear-gradient(135deg, var(--red), #c82333);
+            color: #fff; border: none; border-radius: 10px;
+            padding: 10px 24px; font-weight: 700; cursor: pointer;
+            transition: all .2s; box-shadow: 0 4px 14px rgba(220,53,69,.3);
+        }
+        .btn-update:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(220,53,69,.4); }
+
+        /* TOAST */
+        #odToast {
+            position: fixed; top: 76px; right: 18px; z-index: 9999;
+            min-width: 260px; border-radius: 12px; padding: 12px 18px;
+            display: flex; align-items: center; gap: 10px; font-weight: 500;
+            box-shadow: 0 6px 28px rgba(0,0,0,.15);
+            transform: translateX(130%); transition: transform .4s cubic-bezier(.175,.885,.32,1.275);
+        }
+        #odToast.show { transform: translateX(0); }
+        #odToast.ok   { background: #28a745; color: #fff; }
+        #odToast.err  { background: var(--red); color: #fff; }
+    </style>
+    </th:block>
+</head>
+<body>
+<th:block layout:fragment="content">
+
+    <!-- HERO -->
+    <div class="od-hero">
+        <div class="container">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <div>
+                    <nav class="mb-2">
+                        <ol class="breadcrumb mb-0" style="font-size:.8rem;">
+                            <li class="breadcrumb-item">
+                                <a href="/admin/dashboard" class="text-white-50 text-decoration-none">Dashboard</a>
+                            </li>
+                            <li class="breadcrumb-item">
+                                <a href="/admin/orders" class="text-white-50 text-decoration-none">Đơn hàng</a>
+                            </li>
+                            <li class="breadcrumb-item active text-danger"
+                                th:text="${'#GS-' + order.id}">Chi tiết</li>
+                        </ol>
+                    </nav>
+                    <div class="order-code" th:text="${'Đơn hàng #GS-' + order.id}">Đơn hàng</div>
+                    <div class="order-date">
+                        <i class="bi bi-calendar3 me-1"></i>
+                        Đặt ngày <span th:text="${#temporals.format(order.ngayDat, 'dd/MM/yyyy')}">—</span>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                    <span class="status-badge"
+                          th:classappend="${'status-' + order.tinhTrang}"
+                          th:text="${order.tinhTrangLabel}">—</span>
+                    <a href="/admin/orders" class="btn btn-outline-light btn-sm rounded-pill px-3">
+                        <i class="bi bi-arrow-left me-1"></i>Quay lại
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container pb-5">
+
+        <!-- STEPPER -->
+        <div class="card border-0 shadow-sm mb-4 p-4"
+             th:if="${order.tinhTrang != 'DA_HUY'}">
+            <div class="stepper">
+                <div class="step" th:classappend="${order.tinhTrang == 'CHO_XAC_NHAN'} ? 'active' : 'done'">
+                    <div class="step-circle"><i class="bi bi-clock"></i></div>
+                    <div class="step-label">Chờ xác nhận</div>
+                </div>
+                <div class="step"
+                     th:classappend="${order.tinhTrang == 'DA_XAC_NHAN'} ? 'active' :
+                                     (${order.tinhTrang == 'DANG_GIAO' or order.tinhTrang == 'DA_GIAO'} ? 'done' : '')">
+                    <div class="step-circle"><i class="bi bi-check2"></i></div>
+                    <div class="step-label">Đã xác nhận</div>
+                </div>
+                <div class="step"
+                     th:classappend="${order.tinhTrang == 'DANG_GIAO'} ? 'active' :
+                                     (${order.tinhTrang == 'DA_GIAO'} ? 'done' : '')">
+                    <div class="step-circle"><i class="bi bi-truck"></i></div>
+                    <div class="step-label">Đang giao</div>
+                </div>
+                <div class="step"
+                     th:classappend="${order.tinhTrang == 'DA_GIAO'} ? 'done' : ''">
+                    <div class="step-circle"><i class="bi bi-bag-check"></i></div>
+                    <div class="step-label">Đã giao</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm mb-4 p-3 d-flex flex-row align-items-center gap-3"
+             th:if="${order.tinhTrang == 'DA_HUY'}"
+             style="background:#fce4ec;border:1.5px solid #ffcdd2!important;">
+            <i class="bi bi-x-circle-fill text-danger fs-3"></i>
+            <div>
+                <div class="fw-bold text-danger">Đơn hàng đã bị hủy</div>
+                <div class="small text-muted">Đơn hàng này đã được hủy và không thể khôi phục</div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+
+            <!-- CỘT TRÁI -->
+            <div class="col-lg-8">
+
+                <!-- SẢN PHẨM -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white py-3 border-bottom">
+                        <h6 class="mb-0 fw-bold">
+                            <i class="bi bi-box-seam text-danger me-2"></i>
+                            Sản phẩm đặt mua (<span th:text="${order.chiTietDonHangs?.size() ?: 0}">0</span>)
+                        </h6>
+                    </div>
+                    <div class="card-body p-0">
+                        <table class="prod-table">
+                            <thead>
+                                <tr>
+                                    <th>Sản phẩm</th>
+                                    <th class="text-center">SL</th>
+                                    <th class="text-end">Đơn giá</th>
+                                    <th class="text-end">Thành tiền</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="ct : ${order.chiTietDonHangs}">
+                                    <td>
+                                        <div class="d-flex align-items-center gap-3">
+                                            <img th:src="${ct.sanPham.hinhAnh != null
+                                                          and #strings.startsWith(ct.sanPham.hinhAnh,'http')
+                                                          ? ct.sanPham.hinhAnh
+                                                          : '/images/products/' + ct.sanPham.hinhAnh}"
+                                                 class="prod-img"
+                                                 onerror="this.src='https://placehold.co/56x56/f8f9fa/dc3545?text=img'"/>
+                                            <div>
+                                                <div class="prod-name" th:text="${ct.sanPham.tenSanPham}">—</div>
+                                                <div class="text-muted small" th:if="${ct.sanPham.hang != null}"
+                                                     th:text="${ct.sanPham.hang.tenHang}">—</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-center fw-bold" th:text="${ct.soLuong}">1</td>
+                                    <td class="text-end" th:text="${#numbers.formatInteger(ct.gia, 0, 'COMMA') + '₫'}">—</td>
+                                    <td class="text-end fw-bold text-danger"
+                                        th:text="${#numbers.formatInteger(ct.thanhTien, 0, 'COMMA') + '₫'}">—</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- CẬP NHẬT TRẠNG THÁI (ADMIN) -->
+                <div class="card border-0 shadow-sm"
+                     th:if="${order.tinhTrang != 'DA_GIAO' and order.tinhTrang != 'DA_HUY'}">
+                    <div class="card-header bg-white py-3 border-bottom">
+                        <h6 class="mb-0 fw-bold">
+                            <i class="bi bi-pencil-square text-danger me-2"></i>Cập nhật trạng thái
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex flex-wrap gap-3 align-items-center">
+                            <select class="status-select-lg" id="statusSelectDetail">
+                                <option value="CHO_XAC_NHAN" th:selected="${order.tinhTrang == 'CHO_XAC_NHAN'}">⏳ Chờ xác nhận</option>
+                                <option value="DA_XAC_NHAN"  th:selected="${order.tinhTrang == 'DA_XAC_NHAN'}">✅ Đã xác nhận</option>
+                                <option value="DANG_GIAO"    th:selected="${order.tinhTrang == 'DANG_GIAO'}">🚚 Đang giao hàng</option>
+                                <option value="DA_GIAO"      th:selected="${order.tinhTrang == 'DA_GIAO'}">📦 Đã giao hàng</option>
+                                <option value="DA_HUY"       th:selected="${order.tinhTrang == 'DA_HUY'}">❌ Hủy đơn</option>
+                            </select>
+                            <button class="btn-update" th:attr="onclick=${'doUpdateStatus(' + order.id + ')'}">
+                                <i class="bi bi-check2-circle me-2"></i>Cập nhật
+                            </button>
+                        </div>
+                        <div class="mt-3 p-3 rounded-3 small text-muted" style="background:#f8f9fa;">
+                            <i class="bi bi-info-circle me-1 text-danger"></i>
+                            <strong>Lưu ý:</strong> Sau khi chọn "Đã giao hàng", đơn sẽ không thể thay đổi trạng thái.
+                            Chọn "Hủy đơn" sẽ thông báo đến khách hàng.
+                        </div>
+                    </div>
+                </div>
+
+            </div><!-- end col-lg-8 -->
+
+            <!-- CỘT PHẢI -->
+            <div class="col-lg-4">
+
+                <!-- TỔNG TIỀN -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white py-3 border-bottom">
+                        <h6 class="mb-0 fw-bold">
+                            <i class="bi bi-calculator text-danger me-2"></i>Thanh toán
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="total-row">
+                            <span class="tr-label">Tạm tính</span>
+                            <span class="tr-val"
+                                  th:text="${#numbers.formatInteger((order.tongTien ?: 0) - (order.phiVanChuyen ?: 0), 0, 'COMMA') + '₫'}">0₫</span>
+                        </div>
+                        <div class="total-row">
+                            <span class="tr-label">Phí vận chuyển</span>
+                            <span class="tr-val" th:if="${order.phiVanChuyen != null and order.phiVanChuyen > 0}"
+                                  th:text="${#numbers.formatInteger(order.phiVanChuyen, 0, 'COMMA') + '₫'}">0₫</span>
+                            <span class="tr-val text-success fw-bold" th:if="${order.phiVanChuyen == null or order.phiVanChuyen == 0}">Miễn phí</span>
+                        </div>
+                        <div class="total-row">
+                            <span class="tr-label">Khuyến mãi</span>
+                            <span class="tr-val text-success" th:text="${'-' + #numbers.formatInteger(order.khuyenMai ?: 0, 0, 'COMMA') + '₫'}">0₫</span>
+                        </div>
+                        <div class="total-row grand">
+                            <span class="tr-label fw-bold" style="color:#1a1a2e;">Tổng cộng</span>
+                            <span class="tr-val" th:text="${#numbers.formatInteger(order.tongTien ?: 0, 0, 'COMMA') + '₫'}">0₫</span>
+                        </div>
+                        <div class="mt-3 p-2 rounded-3 text-center small"
+                             style="background:#e8f5e9;color:#2e7d32;font-weight:600;">
+                            <i class="bi bi-qr-code me-1"></i>Thanh toán chuyển khoản MBBank
+                        </div>
+                    </div>
+                </div>
+
+                <!-- THÔNG TIN KHÁCH HÀNG -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white py-3 border-bottom">
+                        <h6 class="mb-0 fw-bold">
+                            <i class="bi bi-person-fill text-danger me-2"></i>Khách hàng
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="info-row">
+                            <span class="ir-label">Tên</span>
+                            <span class="ir-val" th:text="${order.nguoiDung.ten ?: '—'}">—</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="ir-label">Email</span>
+                            <span class="ir-val" style="word-break:break-all;"
+                                  th:text="${order.nguoiDung.email ?: '—'}">—</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="ir-label">SĐT</span>
+                            <span class="ir-val" th:text="${order.nguoiDung.soDienThoai ?: '—'}">—</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- THÔNG TIN GIAO HÀNG -->
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white py-3 border-bottom">
+                        <h6 class="mb-0 fw-bold">
+                            <i class="bi bi-truck text-danger me-2"></i>Giao hàng
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="info-row">
+                            <span class="ir-label">Đơn vị</span>
+                            <span class="ir-val">
+                                <span class="badge bg-secondary bg-opacity-10 text-dark"
+                                      th:text="${order.donViVanChuyen ?: 'GHN'}">GHN</span>
+                            </span>
+                        </div>
+                        <div class="mt-2 p-3 rounded-3 small" style="background:#f8f9fa;line-height:1.7;"
+                             th:if="${order.thongTinGiaoHang != null}">
+                            <i class="bi bi-geo-alt-fill text-danger me-1"></i>
+                            <span th:text="${order.thongTinGiaoHang}">—</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div><!-- end col-lg-4 -->
+
+        </div><!-- end row -->
+    </div><!-- end container -->
+
+    <!-- TOAST -->
+    <div id="odToast" class="ok">
+        <i class="bi bi-check-circle-fill fs-5"></i>
+        <span id="odToastTxt">OK</span>
+    </div>
+
+</th:block>
+<th:block layout:fragment="scripts">
+<script>
+    const CSRF_TOKEN  = document.querySelector('meta[name="_csrf"]')?.content ?? '';
+    const CSRF_HEADER = document.querySelector('meta[name="_csrf_header"]')?.content ?? 'X-CSRF-TOKEN';
+
+    function doUpdateStatus(orderId) {
+        const status = document.getElementById('statusSelectDetail').value;
+        fetch(`/admin/orders/${orderId}/status`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                [CSRF_HEADER]: CSRF_TOKEN
+            },
+            body: `status=${encodeURIComponent(status)}`
+        })
+        .then(r => r.json())
+        .then(d => {
+            if (d.success) {
+                showToast('✓ ' + d.message, 'ok');
+                setTimeout(() => location.reload(), 1200);
+            } else {
+                showToast(d.message, 'err');
+            }
+        })
+        .catch(() => showToast('Lỗi kết nối!', 'err'));
+    }
+
+    let _tt;
+    function showToast(msg, type = 'ok') {
+        const el = document.getElementById('odToast');
+        document.getElementById('odToastTxt').textContent = msg;
+        el.className = type;
+        el.classList.add('show');
+        clearTimeout(_tt);
+        _tt = setTimeout(() => el.classList.remove('show'), 2800);
+    }
+</script>
+</th:block>
+</body>
+</html>

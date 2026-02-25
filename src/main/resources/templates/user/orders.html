@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Đơn hàng của tôi</title>
+    <th:block layout:fragment="css">
+    <style>
+        :root { --red:#dc3545; --dark2:#1a1a2e; }
+
+        .user-hero {
+            background: linear-gradient(135deg, #0d1117, #1a1a2e);
+            padding: 40px 0 50px;
+        }
+
+        /* STATUS BADGE */
+        .status-badge {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 4px 13px; border-radius: 50px;
+            font-size: .77rem; font-weight: 700;
+        }
+        .status-badge::before {
+            content: ''; width: 6px; height: 6px; border-radius: 50%;
+            background: currentColor; display: inline-block;
+        }
+        .status-CHO_XAC_NHAN { background: #fff8e1; color: #f57c00; }
+        .status-DA_XAC_NHAN  { background: #e3f2fd; color: #1565c0; }
+        .status-DANG_GIAO    { background: #e0f7fa; color: #00838f; }
+        .status-DA_GIAO      { background: #e8f5e9; color: #2e7d32; }
+        .status-DA_HUY       { background: #fce4ec; color: #c62828; }
+
+        /* ORDER CARD */
+        .order-card {
+            border: 1px solid #f0f0f0; border-radius: 16px;
+            overflow: hidden; margin-bottom: 16px;
+            transition: box-shadow .25s, transform .25s;
+            background: #fff;
+        }
+        .order-card:hover { box-shadow: 0 8px 28px rgba(0,0,0,.08); transform: translateY(-2px); }
+
+        .order-card-header {
+            background: #f8f9fa; padding: 14px 20px;
+            display: flex; flex-wrap: wrap; align-items: center; gap: 12px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .order-id { font-weight: 800; color: var(--dark2); font-size: .95rem; }
+        .order-date { color: #aaa; font-size: .8rem; }
+
+        .order-card-body { padding: 16px 20px; }
+
+        /* Product preview row */
+        .prod-preview {
+            display: flex; align-items: center; gap: 12px;
+            padding: 10px 0;
+        }
+        .prod-preview:not(:last-child) { border-bottom: 1px solid #f8f8f8; }
+        .prod-thumb {
+            width: 52px; height: 52px; border-radius: 10px;
+            object-fit: contain; background: #f8f9fa;
+            border: 1px solid #f0f0f0; padding: 4px; flex-shrink: 0;
+        }
+        .prod-info .prod-name {
+            font-weight: 600; font-size: .88rem; color: var(--dark2);
+            display: -webkit-box; -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical; overflow: hidden;
+        }
+        .prod-info .prod-qty { color: #aaa; font-size: .78rem; margin-top: 2px; }
+
+        .order-card-footer {
+            background: #fafafa; padding: 12px 20px;
+            border-top: 1px solid #f0f0f0;
+            display: flex; flex-wrap: wrap; align-items: center;
+            justify-content: space-between; gap: 10px;
+        }
+        .total-amount { font-size: 1.15rem; font-weight: 900; color: var(--red); }
+        .total-label  { font-size: .8rem; color: #aaa; }
+
+        .btn-detail {
+            padding: 7px 20px; border-radius: 9px;
+            background: var(--dark2); color: #fff;
+            border: none; font-weight: 600; font-size: .83rem;
+            text-decoration: none; transition: all .2s;
+        }
+        .btn-detail:hover { background: #111827; color: #fff; transform: translateY(-1px); }
+
+        .btn-cancel {
+            padding: 7px 16px; border-radius: 9px;
+            background: transparent; color: var(--red);
+            border: 1.5px solid var(--red); font-weight: 600; font-size: .83rem;
+            cursor: pointer; transition: all .2s;
+        }
+        .btn-cancel:hover { background: var(--red); color: #fff; }
+
+        /* EMPTY STATE */
+        .empty-state { text-align: center; padding: 80px 20px; }
+        .empty-ico {
+            width: 100px; height: 100px; border-radius: 50%;
+            background: linear-gradient(135deg, #fff5f5, #ffe5e7);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2.5rem; color: var(--red); margin: 0 auto 20px;
+        }
+
+        /* FILTER CHIPS */
+        .filter-chip {
+            padding: 5px 14px; border-radius: 50px; font-size: .8rem; font-weight: 600;
+            border: 1.5px solid #e0e0e0; background: #fff; color: #666;
+            text-decoration: none; transition: all .2s; cursor: pointer;
+        }
+        .filter-chip:hover,
+        .filter-chip.active { background: var(--red); border-color: var(--red); color: #fff; }
+
+        /* TOAST */
+        #userToast {
+            position: fixed; top: 76px; right: 18px; z-index: 9999;
+            min-width: 260px; border-radius: 12px; padding: 12px 18px;
+            display: flex; align-items: center; gap: 10px; font-weight: 500;
+            box-shadow: 0 6px 28px rgba(0,0,0,.15);
+            transform: translateX(130%); transition: transform .4s cubic-bezier(.175,.885,.32,1.275);
+        }
+        #userToast.show { transform: translateX(0); }
+        #userToast.ok   { background: #28a745; color: #fff; }
+        #userToast.err  { background: var(--red); color: #fff; }
+    </style>
+    </th:block>
+</head>
+<body>
+<th:block layout:fragment="content">
+
+    <!-- HERO -->
+    <div class="user-hero">
+        <div class="container text-center">
+            <div style="width:72px;height:72px;border-radius:50%;
+                        background:rgba(220,53,69,.15);border:2px solid rgba(220,53,69,.3);
+                        display:flex;align-items:center;justify-content:center;
+                        font-size:1.8rem;color:#ff6b7a;margin:0 auto 16px;">
+                <i class="bi bi-bag-heart-fill"></i>
+            </div>
+            <h1 class="fw-bold text-white mb-2">Đơn hàng của tôi</h1>
+            <p class="text-white-50">Theo dõi và quản lý tất cả đơn hàng của bạn</p>
+
+            <!-- Summary chips -->
+            <div class="d-flex flex-wrap justify-content-center gap-3 mt-4"
+                 th:if="${orders != null and !orders.isEmpty()}">
+                <div class="d-flex align-items-center gap-2 px-3 py-2 rounded-pill"
+                     style="background:rgba(255,255,255,.08);color:#fff;font-size:.82rem;">
+                    <i class="bi bi-bag-fill text-danger"></i>
+                    <span><strong th:text="${orders.size()}">0</strong> đơn hàng</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container py-4 pb-5">
+
+        <!-- EMPTY STATE -->
+        <div th:if="${orders == null or orders.isEmpty()}" class="empty-state">
+            <div class="empty-ico"><i class="bi bi-bag-x"></i></div>
+            <h4 class="fw-bold mb-2" style="color:#1a1a2e;">Chưa có đơn hàng nào</h4>
+            <p class="text-muted mb-4">Hãy khám phá cửa hàng và đặt đơn hàng đầu tiên của bạn!</p>
+            <a href="/products" class="btn btn-danger btn-lg px-5 rounded-pill fw-bold">
+                <i class="bi bi-shop me-2"></i>Mua sắm ngay
+            </a>
+        </div>
+
+        <!-- ORDER LIST -->
+        <div th:unless="${orders == null or orders.isEmpty()}">
+
+            <!-- Filter row -->
+            <div class="d-flex flex-wrap gap-2 mb-4">
+                <span class="filter-chip active" onclick="filterOrders('all', this)">Tất cả</span>
+                <span class="filter-chip" onclick="filterOrders('CHO_XAC_NHAN', this)">⏳ Chờ xác nhận</span>
+                <span class="filter-chip" onclick="filterOrders('DA_XAC_NHAN', this)">✅ Đã xác nhận</span>
+                <span class="filter-chip" onclick="filterOrders('DANG_GIAO', this)">🚚 Đang giao</span>
+                <span class="filter-chip" onclick="filterOrders('DA_GIAO', this)">📦 Đã giao</span>
+                <span class="filter-chip" onclick="filterOrders('DA_HUY', this)">❌ Đã hủy</span>
+            </div>
+
+            <!-- ORDER CARDS -->
+            <div id="orderList">
+                <div class="order-card"
+                     th:each="order : ${orders}"
+                     th:attr="data-status=${order.tinhTrang}">
+
+                    <!-- Header -->
+                    <div class="order-card-header">
+                        <div class="d-flex align-items-center gap-2 flex-grow-1">
+                            <i class="bi bi-receipt text-danger"></i>
+                            <span class="order-id" th:text="${'#GS-' + order.id}">—</span>
+                        </div>
+                        <span class="status-badge"
+                              th:classappend="${'status-' + order.tinhTrang}"
+                              th:text="${order.tinhTrangLabel}">—</span>
+                        <span class="order-date">
+                            <i class="bi bi-calendar3 me-1"></i>
+                            <span th:text="${#temporals.format(order.ngayDat, 'dd/MM/yyyy')}">—</span>
+                        </span>
+                    </div>
+
+                    <!-- Products -->
+                    <div class="order-card-body">
+                        <div th:each="ct, iter : ${order.chiTietDonHangs}"
+                             th:if="${iter.index < 3}"
+                             class="prod-preview">
+                            <img class="prod-thumb"
+                                 th:src="${ct.sanPham.hinhAnh != null
+                                          and #strings.startsWith(ct.sanPham.hinhAnh,'http')
+                                          ? ct.sanPham.hinhAnh
+                                          : '/images/products/' + ct.sanPham.hinhAnh}"
+                                 th:alt="${ct.sanPham.tenSanPham}"
+                                 onerror="this.src='https://placehold.co/52x52/f8f9fa/dc3545?text=img'"/>
+                            <div class="prod-info flex-grow-1">
+                                <div class="prod-name" th:text="${ct.sanPham.tenSanPham}">—</div>
+                                <div class="prod-qty">
+                                    Số lượng: <strong th:text="${ct.soLuong}">1</strong>
+                                    · <span th:text="${#numbers.formatInteger(ct.gia, 0, 'COMMA') + '₫'}">0₫</span>
+                                </div>
+                            </div>
+                            <div class="fw-bold text-danger"
+                                 th:text="${#numbers.formatInteger(ct.thanhTien, 0, 'COMMA') + '₫'}">0₫</div>
+                        </div>
+
+                        <!-- Nếu có nhiều hơn 3 sản phẩm -->
+                        <div th:if="${order.chiTietDonHangs.size() > 3}"
+                             class="text-center mt-2 small text-muted">
+                            và <span th:text="${order.chiTietDonHangs.size() - 3}">0</span> sản phẩm khác...
+                        </div>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="order-card-footer">
+                        <div>
+                            <div class="total-label">Tổng thanh toán</div>
+                            <div class="total-amount"
+                                 th:text="${#numbers.formatInteger(order.tongTien, 0, 'COMMA') + '₫'}">0₫</div>
+                        </div>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <!-- Hủy đơn (chỉ khi CHO_XAC_NHAN) -->
+                            <button th:if="${order.tinhTrang == 'CHO_XAC_NHAN'}"
+                                    class="btn-cancel"
+                                    th:attr="onclick=${'cancelOrder(' + order.id + ', this)'}">
+                                <i class="bi bi-x-circle me-1"></i>Hủy đơn
+                            </button>
+                            <!-- Xem chi tiết -->
+                            <a th:href="@{'/orders/' + ${order.id}}" class="btn-detail">
+                                <i class="bi bi-eye me-1"></i>Xem chi tiết
+                            </a>
+                        </div>
+                    </div>
+
+                </div><!-- end order-card -->
+            </div><!-- end orderList -->
+
+        </div>
+
+    </div>
+
+    <!-- TOAST -->
+    <div id="userToast" class="ok">
+        <i class="bi bi-check-circle-fill fs-5"></i>
+        <span id="userToastTxt">OK</span>
+    </div>
+
+</th:block>
+<th:block layout:fragment="scripts">
+<script>
+    const CSRF_TOKEN  = document.querySelector('meta[name="_csrf"]')?.content ?? '';
+    const CSRF_HEADER = document.querySelector('meta[name="_csrf_header"]')?.content ?? 'X-CSRF-TOKEN';
+
+    // Filter orders by status (client-side)
+    function filterOrders(status, el) {
+        document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+        el.classList.add('active');
+
+        document.querySelectorAll('.order-card').forEach(card => {
+            if (status === 'all' || card.dataset.status === status) {
+                card.style.display = '';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+
+    // Cancel order
+    function cancelOrder(orderId, btn) {
+        if (!confirm('Bạn có chắc muốn hủy đơn hàng #GS-' + orderId + '?')) return;
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>Đang xử lý...';
+
+        fetch(`/orders/${orderId}/cancel`, {
+            method: 'POST',
+            headers: { [CSRF_HEADER]: CSRF_TOKEN }
+        })
+        .then(r => r.json())
+        .then(d => {
+            if (d.success) {
+                showToast('✓ Đã hủy đơn hàng thành công!', 'ok');
+                // Cập nhật badge trên card
+                const card = btn.closest('.order-card');
+                const badge = card?.querySelector('.status-badge');
+                if (badge) {
+                    badge.textContent = 'Đã hủy';
+                    badge.className = 'status-badge status-DA_HUY';
+                }
+                card.dataset.status = 'DA_HUY';
+                btn.remove();
+            } else {
+                showToast(d.message, 'err');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-x-circle me-1"></i>Hủy đơn';
+            }
+        })
+        .catch(() => {
+            showToast('Lỗi kết nối server!', 'err');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-x-circle me-1"></i>Hủy đơn';
+        });
+    }
+
+    let _tt;
+    function showToast(msg, type = 'ok') {
+        const el = document.getElementById('userToast');
+        document.getElementById('userToastTxt').textContent = msg;
+        el.className = type;
+        el.classList.add('show');
+        clearTimeout(_tt);
+        _tt = setTimeout(() => el.classList.remove('show'), 3000);
+    }
+</script>
+</th:block>
+</body>
+</html>

@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title th:text="${'Đơn hàng #GS-' + order.id}">Chi tiết đơn hàng</title>
+    <th:block layout:fragment="css">
+    <style>
+        :root { --red:#dc3545; --dark2:#1a1a2e; }
+
+        .uod-hero {
+            background: linear-gradient(135deg, #0d1117, #1a1a2e);
+            padding: 36px 0 46px;
+        }
+
+        /* STEPPER */
+        .stepper { display: flex; align-items: flex-start; gap: 0; overflow-x: auto; padding: 4px 0; }
+        .step {
+            display: flex; flex-direction: column; align-items: center;
+            flex: 1; min-width: 70px; position: relative;
+        }
+        .step:not(:last-child)::after {
+            content: '';
+            position: absolute; top: 18px; left: 55%; right: -45%;
+            height: 3px; background: #e0e0e0; z-index: 0;
+        }
+        .step.done:not(:last-child)::after,
+        .step.active:not(:last-child)::after { background: #28a745; }
+        .step-circle {
+            width: 38px; height: 38px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem; z-index: 1;
+            border: 3px solid #e0e0e0; background: #fff; color: #ccc;
+            transition: all .3s;
+        }
+        .step.done   .step-circle { background: #28a745; border-color: #28a745; color: #fff; }
+        .step.active .step-circle { background: var(--red); border-color: var(--red); color: #fff; box-shadow: 0 0 0 5px rgba(220,53,69,.15); }
+        .step-label { font-size: .7rem; font-weight: 600; color: #bbb; margin-top: 7px; text-align: center; }
+        .step.done  .step-label,
+        .step.active .step-label { color: var(--dark2); }
+
+        /* STATUS BADGE */
+        .status-badge {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 5px 15px; border-radius: 50px;
+            font-size: .82rem; font-weight: 700;
+        }
+        .status-CHO_XAC_NHAN { background: #fff8e1; color: #f57c00; }
+        .status-DA_XAC_NHAN  { background: #e3f2fd; color: #1565c0; }
+        .status-DANG_GIAO    { background: #e0f7fa; color: #00838f; }
+        .status-DA_GIAO      { background: #e8f5e9; color: #2e7d32; }
+        .status-DA_HUY       { background: #fce4ec; color: #c62828; }
+
+        /* PRODUCT ROW */
+        .prod-row {
+            display: flex; align-items: center; gap: 14px;
+            padding: 14px 0;
+        }
+        .prod-row:not(:last-child) { border-bottom: 1px solid #f5f5f5; }
+        .prod-thumb {
+            width: 64px; height: 64px; border-radius: 12px;
+            object-fit: contain; background: #f8f9fa;
+            border: 1px solid #f0f0f0; padding: 5px; flex-shrink: 0;
+        }
+        .prod-name  { font-weight: 700; color: var(--dark2); font-size: .9rem; }
+        .prod-brand { font-size: .78rem; color: #aaa; margin-top: 2px; }
+        .prod-qty-price { font-size: .82rem; color: #888; margin-top: 4px; }
+
+        /* INFO ROWS */
+        .info-row { display: flex; gap: 10px; padding: 8px 0; border-bottom: 1px solid #f8f8f8; }
+        .info-row:last-child { border-bottom: none; }
+        .ir-label { color: #aaa; font-size: .82rem; min-width: 110px; flex-shrink: 0; }
+        .ir-val   { font-size: .88rem; font-weight: 600; color: var(--dark2); }
+
+        /* TOTAL */
+        .total-row { display: flex; justify-content: space-between; padding: 8px 0; }
+        .total-row:not(:last-child) { border-bottom: 1px solid #f5f5f5; }
+        .total-row.grand { border-top: 2px solid #f0f0f0; padding-top: 14px; }
+        .tr-label { color: #888; font-size: .88rem; }
+        .tr-val   { font-weight: 700; color: var(--dark2); }
+        .total-row.grand .tr-val { font-size: 1.4rem; color: var(--red); }
+
+        /* TIMELINE */
+        .timeline { list-style: none; padding: 0; margin: 0; position: relative; }
+        .timeline::before {
+            content: ''; position: absolute; left: 16px; top: 0; bottom: 0;
+            width: 2px; background: #f0f0f0;
+        }
+        .tl-item { display: flex; gap: 16px; margin-bottom: 20px; position: relative; }
+        .tl-dot {
+            width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: .85rem; z-index: 1; border: 2px solid #e0e0e0;
+            background: #fff; color: #ccc;
+        }
+        .tl-dot.done   { background: #28a745; border-color: #28a745; color: #fff; }
+        .tl-dot.active { background: var(--red); border-color: var(--red); color: #fff; }
+        .tl-content .tl-title { font-weight: 700; font-size: .88rem; color: var(--dark2); }
+        .tl-content .tl-desc  { font-size: .8rem; color: #aaa; margin-top: 2px; }
+
+        /* CANCEL BOX */
+        .cancel-box {
+            background: #fce4ec; border: 1.5px solid #ffcdd2;
+            border-radius: 14px; padding: 20px;
+        }
+        .btn-cancel-order {
+            background: transparent; border: 2px solid var(--red);
+            color: var(--red); border-radius: 10px; padding: 9px 22px;
+            font-weight: 700; cursor: pointer; transition: all .25s;
+        }
+        .btn-cancel-order:hover { background: var(--red); color: #fff; }
+
+        /* TOAST */
+        #uodToast {
+            position: fixed; top: 76px; right: 18px; z-index: 9999;
+            min-width: 260px; border-radius: 12px; padding: 12px 18px;
+            display: flex; align-items: center; gap: 10px; font-weight: 500;
+            box-shadow: 0 6px 28px rgba(0,0,0,.15);
+            transform: translateX(130%); transition: transform .4s cubic-bezier(.175,.885,.32,1.275);
+        }
+        #uodToast.show { transform: translateX(0); }
+        #uodToast.ok   { background: #28a745; color: #fff; }
+        #uodToast.err  { background: var(--red); color: #fff; }
+    </style>
+    </th:block>
+</head>
+<body>
+<th:block layout:fragment="content">
+
+    <!-- HERO -->
+    <div class="uod-hero">
+        <div class="container">
+            <nav class="mb-3">
+                <ol class="breadcrumb mb-0" style="font-size:.8rem;">
+                    <li class="breadcrumb-item"><a href="/" class="text-white-50 text-decoration-none">Trang chủ</a></li>
+                    <li class="breadcrumb-item"><a href="/orders" class="text-white-50 text-decoration-none">Đơn hàng</a></li>
+                    <li class="breadcrumb-item active text-danger" th:text="${'#GS-' + order.id}">—</li>
+                </ol>
+            </nav>
+            <div class="d-flex flex-wrap align-items-center gap-3">
+                <div>
+                    <h2 class="text-white fw-bold mb-1" th:text="${'Đơn hàng #GS-' + order.id}">—</h2>
+                    <div class="text-white-50 small">
+                        <i class="bi bi-calendar3 me-1"></i>
+                        Đặt ngày <span th:text="${#temporals.format(order.ngayDat, 'dd/MM/yyyy')}">—</span>
+                    </div>
+                </div>
+                <div class="ms-auto">
+                    <span class="status-badge"
+                          th:classappend="${'status-' + order.tinhTrang}"
+                          th:text="${order.tinhTrangLabel}">—</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container py-4 pb-5">
+
+        <!-- STEPPER (chỉ hiện nếu không hủy) -->
+        <div class="card border-0 shadow-sm mb-4 p-4"
+             th:if="${order.tinhTrang != 'DA_HUY'}">
+            <div class="stepper">
+                <div class="step" th:classappend="${order.tinhTrang == 'CHO_XAC_NHAN'} ? 'active' : 'done'">
+                    <div class="step-circle"><i class="bi bi-clock-fill"></i></div>
+                    <div class="step-label">Chờ xác nhận</div>
+                </div>
+                <div class="step"
+                     th:classappend="${order.tinhTrang == 'DA_XAC_NHAN'} ? 'active' :
+                                     (${order.tinhTrang == 'DANG_GIAO' or order.tinhTrang == 'DA_GIAO'} ? 'done' : '')">
+                    <div class="step-circle"><i class="bi bi-check2-circle"></i></div>
+                    <div class="step-label">Xác nhận</div>
+                </div>
+                <div class="step"
+                     th:classappend="${order.tinhTrang == 'DANG_GIAO'} ? 'active' :
+                                     (${order.tinhTrang == 'DA_GIAO'} ? 'done' : '')">
+                    <div class="step-circle"><i class="bi bi-truck"></i></div>
+                    <div class="step-label">Đang giao</div>
+                </div>
+                <div class="step" th:classappend="${order.tinhTrang == 'DA_GIAO'} ? 'done' : ''">
+                    <div class="step-circle"><i class="bi bi-bag-check-fill"></i></div>
+                    <div class="step-label">Đã giao</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- HỦY ĐƠN -->
+        <div class="cancel-box mb-4" th:if="${order.tinhTrang == 'DA_HUY'}">
+            <div class="d-flex align-items-center gap-3">
+                <i class="bi bi-x-circle-fill text-danger fs-2"></i>
+                <div>
+                    <div class="fw-bold text-danger mb-1">Đơn hàng đã bị hủy</div>
+                    <div class="small text-muted">Liên hệ <strong>0794 612 606</strong> nếu bạn cần hỗ trợ</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- CỘT TRÁI -->
+            <div class="col-lg-8">
+
+                <!-- SẢN PHẨM -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white py-3 border-bottom">
+                        <h6 class="mb-0 fw-bold">
+                            <i class="bi bi-box-seam text-danger me-2"></i>
+                            Sản phẩm (<span th:text="${order.chiTietDonHangs?.size() ?: 0}">0</span>)
+                        </h6>
+                    </div>
+                    <div class="card-body py-0">
+                        <div th:each="ct : ${order.chiTietDonHangs}" class="prod-row">
+                            <img class="prod-thumb"
+                                 th:src="${ct.sanPham.hinhAnh != null
+                                          and #strings.startsWith(ct.sanPham.hinhAnh,'http')
+                                          ? ct.sanPham.hinhAnh
+                                          : '/images/products/' + ct.sanPham.hinhAnh}"
+                                 th:alt="${ct.sanPham.tenSanPham}"
+                                 onerror="this.src='https://placehold.co/64x64/f8f9fa/dc3545?text=img'"/>
+                            <div class="flex-grow-1">
+                                <div class="prod-name" th:text="${ct.sanPham.tenSanPham}">—</div>
+                                <div class="prod-brand" th:if="${ct.sanPham.hang != null}"
+                                     th:text="${ct.sanPham.hang.tenHang}">—</div>
+                                <div class="prod-qty-price">
+                                    Số lượng: <strong th:text="${ct.soLuong}">1</strong>
+                                    · Đơn giá: <span th:text="${#numbers.formatInteger(ct.gia, 0, 'COMMA') + '₫'}">0₫</span>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <div class="fw-bold text-danger"
+                                     th:text="${#numbers.formatInteger(ct.thanhTien, 0, 'COMMA') + '₫'}">0₫</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TIMELINE TRẠNG THÁI -->
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white py-3 border-bottom">
+                        <h6 class="mb-0 fw-bold">
+                            <i class="bi bi-clock-history text-danger me-2"></i>Lịch sử trạng thái
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <ul class="timeline">
+                            <li class="tl-item">
+                                <div class="tl-dot done"><i class="bi bi-check"></i></div>
+                                <div class="tl-content">
+                                    <div class="tl-title">Đơn hàng đã đặt</div>
+                                    <div class="tl-desc"
+                                         th:text="${#temporals.format(order.ngayDat, 'dd/MM/yyyy')}">—</div>
+                                </div>
+                            </li>
+                            <li class="tl-item"
+                                th:if="${order.tinhTrang == 'DA_XAC_NHAN' or order.tinhTrang == 'DANG_GIAO' or order.tinhTrang == 'DA_GIAO'}">
+                                <div class="tl-dot done"><i class="bi bi-check"></i></div>
+                                <div class="tl-content">
+                                    <div class="tl-title">Shop đã xác nhận đơn</div>
+                                    <div class="tl-desc">Đơn hàng đang được chuẩn bị</div>
+                                </div>
+                            </li>
+                            <li class="tl-item"
+                                th:if="${order.tinhTrang == 'DANG_GIAO' or order.tinhTrang == 'DA_GIAO'}">
+                                <div class="tl-dot done"><i class="bi bi-truck"></i></div>
+                                <div class="tl-content">
+                                    <div class="tl-title">Đang giao hàng</div>
+                                    <div class="tl-desc"
+                                         th:text="${'Đơn vị vận chuyển: ' + (order.donViVanChuyen ?: 'GHN')}">—</div>
+                                </div>
+                            </li>
+                            <li class="tl-item" th:if="${order.tinhTrang == 'DA_GIAO'}">
+                                <div class="tl-dot done"><i class="bi bi-bag-check"></i></div>
+                                <div class="tl-content">
+                                    <div class="tl-title">Giao hàng thành công</div>
+                                    <div class="tl-desc">Cảm ơn bạn đã mua hàng tại GamingShop!</div>
+                                </div>
+                            </li>
+                            <li class="tl-item" th:if="${order.tinhTrang == 'DA_HUY'}">
+                                <div class="tl-dot" style="background:#dc3545;border-color:#dc3545;color:#fff;">
+                                    <i class="bi bi-x"></i>
+                                </div>
+                                <div class="tl-content">
+                                    <div class="tl-title text-danger">Đơn hàng đã bị hủy</div>
+                                    <div class="tl-desc">Liên hệ shop để được hỗ trợ hoàn tiền</div>
+                                </div>
+                            </li>
+                            <!-- Trạng thái hiện tại (đang chờ) -->
+                            <li class="tl-item" th:if="${order.tinhTrang == 'CHO_XAC_NHAN'}">
+                                <div class="tl-dot active"><i class="bi bi-hourglass-split"></i></div>
+                                <div class="tl-content">
+                                    <div class="tl-title">Chờ shop xác nhận</div>
+                                    <div class="tl-desc">Thường trong vòng 30 phút - 2 giờ</div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div><!-- end col-lg-8 -->
+
+            <!-- CỘT PHẢI -->
+            <div class="col-lg-4">
+
+                <!-- TỔNG TIỀN -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white py-3 border-bottom">
+                        <h6 class="mb-0 fw-bold">
+                            <i class="bi bi-receipt text-danger me-2"></i>Hóa đơn
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="total-row">
+                            <span class="tr-label">Tạm tính</span>
+                            <span class="tr-val"
+                                  th:text="${#numbers.formatInteger((order.tongTien ?: 0) - (order.phiVanChuyen ?: 0), 0, 'COMMA') + '₫'}">0₫</span>
+                        </div>
+                        <div class="total-row">
+                            <span class="tr-label">Phí vận chuyển</span>
+                            <span class="tr-val text-success fw-bold"
+                                  th:if="${order.phiVanChuyen == null or order.phiVanChuyen == 0}">Miễn phí</span>
+                            <span class="tr-val"
+                                  th:if="${order.phiVanChuyen != null and order.phiVanChuyen > 0}"
+                                  th:text="${#numbers.formatInteger(order.phiVanChuyen, 0, 'COMMA') + '₫'}">0₫</span>
+                        </div>
+                        <div class="total-row">
+                            <span class="tr-label">Khuyến mãi</span>
+                            <span class="tr-val text-success"
+                                  th:text="${'-' + #numbers.formatInteger(order.khuyenMai ?: 0, 0, 'COMMA') + '₫'}">0₫</span>
+                        </div>
+                        <div class="total-row grand">
+                            <span class="tr-label fw-bold" style="color:#1a1a2e;">Tổng cộng</span>
+                            <span class="tr-val"
+                                  th:text="${#numbers.formatInteger(order.tongTien ?: 0, 0, 'COMMA') + '₫'}">0₫</span>
+                        </div>
+                        <div class="mt-3 p-2 rounded-3 text-center small"
+                             style="background:#e3f2fd;color:#1565c0;font-weight:600;">
+                            <i class="bi bi-qr-code me-1"></i>Đã thanh toán chuyển khoản MBBank
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ĐỊA CHỈ GIAO HÀNG -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white py-3 border-bottom">
+                        <h6 class="mb-0 fw-bold">
+                            <i class="bi bi-geo-alt-fill text-danger me-2"></i>Địa chỉ giao hàng
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="info-row">
+                            <span class="ir-label">Đơn vị VC</span>
+                            <span class="ir-val">
+                                <span class="badge bg-secondary bg-opacity-10 text-dark"
+                                      th:text="${order.donViVanChuyen ?: 'GHN'}">GHN</span>
+                            </span>
+                        </div>
+                        <div class="mt-2 p-3 rounded-3 small text-muted"
+                             style="background:#f8f9fa; line-height:1.7;"
+                             th:if="${order.thongTinGiaoHang != null}">
+                            <i class="bi bi-pin-map-fill text-danger me-1"></i>
+                            <span th:text="${order.thongTinGiaoHang}">—</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- HỦY ĐƠN (chỉ khi CHO_XAC_NHAN) -->
+                <div class="card border-0 shadow-sm" th:if="${order.tinhTrang == 'CHO_XAC_NHAN'}">
+                    <div class="card-body text-center">
+                        <p class="text-muted small mb-3">
+                            <i class="bi bi-info-circle me-1"></i>
+                            Bạn có thể hủy đơn khi chưa được xác nhận
+                        </p>
+                        <button class="btn-cancel-order"
+                                th:attr="onclick=${'doCancelOrder(' + order.id + ')'}">
+                            <i class="bi bi-x-circle me-2"></i>Hủy đơn hàng này
+                        </button>
+                    </div>
+                </div>
+
+                <!-- LIÊN HỆ SHOP -->
+                <div class="card border-0 shadow-sm mt-4"
+                     style="background:linear-gradient(135deg,#fff5f5,#fff0f0);border:1px solid #ffd6d6!important;">
+                    <div class="card-body text-center">
+                        <i class="bi bi-headset text-danger fs-3 mb-2 d-block"></i>
+                        <div class="fw-bold mb-1" style="color:#1a1a2e;">Cần hỗ trợ?</div>
+                        <div class="text-muted small mb-3">Liên hệ ngay với chúng tôi</div>
+                        <a href="tel:0794612606" class="btn btn-danger btn-sm rounded-pill px-4 fw-bold">
+                            <i class="bi bi-telephone-fill me-1"></i>0794 612 606
+                        </a>
+                    </div>
+                </div>
+
+            </div><!-- end col-lg-4 -->
+
+        </div><!-- end row -->
+    </div>
+
+    <div id="uodToast" class="ok">
+        <i class="bi bi-check-circle-fill fs-5"></i>
+        <span id="uodToastTxt">OK</span>
+    </div>
+
+</th:block>
+<th:block layout:fragment="scripts">
+<script>
+    const CSRF_TOKEN  = document.querySelector('meta[name="_csrf"]')?.content ?? '';
+    const CSRF_HEADER = document.querySelector('meta[name="_csrf_header"]')?.content ?? 'X-CSRF-TOKEN';
+
+    function doCancelOrder(orderId) {
+        if (!confirm('Xác nhận hủy đơn hàng #GS-' + orderId + '?')) return;
+
+        fetch(`/orders/${orderId}/cancel`, {
+            method: 'POST',
+            headers: { [CSRF_HEADER]: CSRF_TOKEN }
+        })
+        .then(r => r.json())
+        .then(d => {
+            if (d.success) {
+                showToast('Đã hủy đơn hàng thành công!', 'ok');
+                setTimeout(() => location.reload(), 1200);
+            } else {
+                showToast(d.message, 'err');
+            }
+        })
+        .catch(() => showToast('Lỗi kết nối!', 'err'));
+    }
+
+    let _tt;
+    function showToast(msg, type = 'ok') {
+        const el = document.getElementById('uodToast');
+        document.getElementById('uodToastTxt').textContent = msg;
+        el.className = type;
+        el.classList.add('show');
+        clearTimeout(_tt);
+        _tt = setTimeout(() => el.classList.remove('show'), 3000);
+    }
+</script>
+</th:block>
+</body>
+</html>
