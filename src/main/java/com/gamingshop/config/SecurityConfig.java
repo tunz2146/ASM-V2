@@ -42,7 +42,7 @@ public class SecurityConfig {
                 "/", "/home",
                 "/products/**",
                 "/css/**", "/js/**", "/images/**",
-                "/register", "/login",
+                "/register", "/do-register", "/login",
 
                 // Các trang public thêm vào
                 "/deals", "/about", "/contact",

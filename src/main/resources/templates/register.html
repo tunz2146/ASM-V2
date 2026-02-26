@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title>Đăng ký - Gaming Shop</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .login-card {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        padding: 2rem;
+        width: 100%;
+        max-width: 400px;
+        color: white;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+      }
+      .form-control {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: white;
+      }
+      .form-control:focus {
+        background: rgba(255, 255, 255, 0.15);
+        border-color: #dc3545;
+        color: white;
+        box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="login-card">
+      <div class="text-center mb-4">
+        <h2 class="fw-bold">
+          <i class="bi bi-person-plus text-danger me-2"></i>ĐĂNG KÝ
+        </h2>
+        <p class="text-white-50">Tạo tài khoản mới để mua sắm</p>
+      </div>
+      <div
+        th:if="${param.error} == 'exists'"
+        class="alert alert-danger text-center small py-2"
+      >
+        Email đã được sử dụng, hãy dùng email khác.
+      </div>
+
+      <form th:action="@{/do-register}" method="post" th:object="${nguoiDung}">
+        <div class="mb-3">
+          <label class="form-label">Họ và tên</label>
+          <input
+            type="text"
+            th:field="*{ten}"
+            class="form-control"
+            placeholder="Nguyễn Văn A"
+            required
+          />
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Email</label>
+          <input
+            type="email"
+            th:field="*{email}"
+            class="form-control"
+            placeholder="name@example.com"
+            required
+          />
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Mật khẩu</label>
+          <input
+            type="password"
+            th:field="*{password}"
+            class="form-control"
+            placeholder="Mật khẩu"
+            required
+          />
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Số điện thoại</label>
+          <input
+            type="text"
+            th:field="*{soDienThoai}"
+            class="form-control"
+            placeholder="0912345678"
+          />
+        </div>
+
+        <button type="submit" class="btn btn-danger w-100 py-2 fw-bold mb-3">
+          ĐĂNG KÝ
+        </button>
+
+        <div class="text-center small">
+          <span class="text-white-50">Đã có tài khoản?</span>
+          <a href="/login" class="text-danger text-decoration-none fw-bold"
+            >Đăng nhập</a
+          >
+        </div>
+        <div class="text-center mt-3">
+          <a href="/" class="text-secondary text-decoration-none"
+            ><i class="bi bi-arrow-left me-1"></i>Về trang chủ</a
+          >
+        </div>
+      </form>
+    </div>
+  </body>
+</html>
