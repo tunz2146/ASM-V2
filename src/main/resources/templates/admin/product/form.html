@@ -1,205 +1,372 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/base}">
+      layout:decorate="~{layout/admin-base}">
 <head>
     <title th:text="${product.id == null ? 'Thêm sản phẩm mới' : 'Cập nhật sản phẩm'}">Form Sản phẩm</title>
+    <th:block layout:fragment="admin-styles">
+    <style>
+        .form-label { font-size: 0.85rem; color: #555; margin-bottom: 5px; }
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 1.5px solid #e0e3ea;
+            font-size: 0.9rem;
+            padding: 10px 14px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 3px rgba(220,53,69,0.1);
+        }
+        .image-drop-zone {
+            min-height: 160px;
+            border: 2px dashed #dde1ea;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fafbfc;
+            overflow: hidden;
+            transition: border-color 0.2s;
+        }
+        .image-drop-zone:hover { border-color: #dc3545; }
+        .nav-pills .nav-link {
+            border-radius: 8px;
+            font-size: 0.82rem;
+            padding: 6px 14px;
+            color: #555;
+        }
+        .nav-pills .nav-link.active { background: #dc3545; color: #fff; }
+        .section-card {
+            background: #fff;
+            border-radius: 14px;
+            border: 1px solid #f0f2f7;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+        }
+        .section-title {
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #dc3545;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-save {
+            background: #dc3545; color: #fff; border: none;
+            border-radius: 10px; padding: 11px 32px;
+            font-weight: 700; font-size: 0.9rem;
+            transition: background 0.2s, transform 0.1s;
+            cursor: pointer;
+        }
+        .btn-save:hover { background: #c82333; transform: translateY(-1px); }
+        .btn-cancel {
+            background: #f0f2f7; color: #555; border: none;
+            border-radius: 10px; padding: 11px 24px;
+            font-size: 0.9rem; text-decoration: none;
+            display: inline-flex; align-items: center; gap: 6px;
+            transition: background 0.2s;
+        }
+        .btn-cancel:hover { background: #e2e6ea; color: #333; }
+        .page-header { margin-bottom: 28px; }
+        .page-header h3 { font-size: 1.35rem; font-weight: 800; color: #1a1a2e; margin: 0; }
+        .page-header p { font-size: 0.82rem; color: #888; margin: 4px 0 0; }
+        .sticky-sidebar { position: sticky; top: 20px; }
+        .input-group .input-group-text {
+            border-radius: 10px 0 0 10px;
+            border: 1.5px solid #e0e3ea;
+            border-right: none;
+            background: #f8f9fa;
+            font-size: 0.8rem;
+            color: #888;
+        }
+        .input-group .form-control { border-radius: 0 10px 10px 0; }
+    </style>
+    </th:block>
 </head>
 <body>
-    <div layout:fragment="content" class="container mt-4 mb-5">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-header bg-danger text-white">
-                        <h5 class="mb-0 fw-bold" 
-                            th:text="${product.id == null ? 'THÊM SẢN PHẨM MỚI' : 'CẬP NHẬT SẢN PHẨM'}">
-                            FORM
-                        </h5>
-                    </div>
-                    <div class="card-body p-4">
-                        <form th:action="@{/admin/products/save}" th:object="${product}" 
-                              method="post" enctype="multipart/form-data">
-                            
-                            <input type="hidden" th:field="*{id}">
-                            
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Tên sản phẩm</label>
-                                <input type="text" class="form-control" th:field="*{tenSanPham}" required>
-                            </div>
+<th:block layout:fragment="content">
 
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Slug (Đường dẫn)</label>
-                                <input type="text" class="form-control" th:field="*{slug}" placeholder="ví-dụ-như-này" required>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label fw-bold">Giá bán (VNĐ)</label>
-                                    <input type="number" class="form-control" th:field="*{giaSanPham}" required>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label fw-bold">Giảm giá (%)</label>
-                                    <input type="number" class="form-control" th:field="*{chietKhau}" value="0">
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label fw-bold">Số lượng tồn</label>
-                                    <input type="number" class="form-control" th:field="*{tonKho}" required>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label fw-bold">Thương hiệu</label>
-                                    <select class="form-select" th:field="*{hang}">
-                                        <option th:each="h : ${brands}" 
-                                                th:value="${h.id}" 
-                                                th:text="${h.tenHang}"></option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Danh mục (Giữ Ctrl để chọn nhiều)</label>
-                                <select class="form-select" th:field="*{loaiSanPhams}" multiple size="4">
-                                    <option th:each="c : ${categories}" 
-                                            th:value="${c.id}" 
-                                            th:text="${c.ten}"></option>
-                                </select>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Hình ảnh sản phẩm</label>
-                                
-                                <div class="card p-3 bg-light border-0">
-                                    <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
-                                        <li class="nav-item" role="presentation">
-                                            <button class="nav-link active btn-sm" id="upload-tab" data-bs-toggle="pill" data-bs-target="#pills-upload" type="button" role="tab">
-                                                <i class="bi bi-cloud-upload me-1"></i>Tải ảnh lên
-                                            </button>
-                                        </li>
-                                        <li class="nav-item" role="presentation">
-                                            <button class="nav-link btn-sm" id="url-tab" data-bs-toggle="pill" data-bs-target="#pills-url" type="button" role="tab">
-                                                <i class="bi bi-link-45deg me-1"></i>Dùng URL Online
-                                            </button>
-                                        </li>
-                                    </ul>
-                                    
-                                    <div class="tab-content" id="pills-tabContent">
-                                        <div class="tab-pane fade show active" id="pills-upload" role="tabpanel">
-                                            <input type="file" name="imageFile" class="form-control" accept="image/*" onchange="previewImage(this)">
-                                            <small class="text-muted mt-1 d-block">Hỗ trợ: jpg, png, webp...</small>
-                                        </div>
-                                        
-                                        <div class="tab-pane fade" id="pills-url" role="tabpanel">
-                                            <input type="text" name="imageUrl" class="form-control" 
-                                                   placeholder="Dán link ảnh vào đây (Ví dụ: https://imgur.com/...)" 
-                                                   oninput="previewUrl(this.value)">
-                                        </div>
-                                    </div>
-
-                                    <div class="mt-3 text-center" style="min-height: 150px; border: 2px dashed #ccc; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: white; overflow: hidden;">
-                                        
-                                        <img id="imagePreview" 
-                                             th:if="${product.hinhAnh != null}"
-                                             th:src="${#strings.startsWith(product.hinhAnh, 'http') ? product.hinhAnh : '/images/products/' + product.hinhAnh}"
-                                             style="max-height: 200px; max-width: 100%;" class="rounded">
-                                             
-                                        <img id="placeholderImage" src="https://via.placeholder.com/150?text=Preview" 
-                                             th:if="${product.hinhAnh == null}"
-                                             style="max-height: 150px; opacity: 0.5;">
-                                        
-                                        <span id="noImageText" class="text-muted position-absolute" th:if="${product.hinhAnh == null}" style="z-index: 1;">
-                                            Chưa chọn ảnh
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Mô tả / Thông số kỹ thuật</label>
-                                <textarea class="form-control" th:field="*{thongSo}" rows="4"></textarea>
-                            </div>
-
-                            <div class="d-flex gap-2">
-                                <button type="submit" class="btn btn-danger px-4 fw-bold">
-                                    <i class="bi bi-save me-2"></i>Lưu sản phẩm
-                                </button>
-                                <a href="/admin/products" class="btn btn-secondary px-4">
-                                    <i class="bi bi-x-circle me-2"></i>Hủy
-                                </a>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
+    <!-- Page Header -->
+    <div class="page-header d-flex align-items-center justify-content-between flex-wrap gap-3">
+        <div>
+            <h3>
+                <i class="bi bi-box-seam text-danger me-2"></i>
+                <span th:text="${product.id == null ? 'Thêm sản phẩm mới' : 'Cập nhật sản phẩm'}">Form</span>
+            </h3>
+            <p th:text="${product.id == null
+                ? 'Điền đầy đủ thông tin để thêm sản phẩm mới'
+                : 'Chỉnh sửa thông tin sản phẩm #' + product.id}">Mô tả</p>
         </div>
+        <a href="/admin/products" class="btn-cancel">
+            <i class="bi bi-arrow-left"></i> Quay lại danh sách
+        </a>
     </div>
 
-    <script layout:fragment="scripts">
-        // 1. Preview khi chọn file từ máy
-        function previewImage(input) {
-            const preview = document.getElementById('imagePreview');
-            const placeholder = document.getElementById('placeholderImage');
-            const noImageText = document.getElementById('noImageText');
-            
-            if (input.files && input.files[0]) {
-                var reader = new FileReader();
-                reader.onload = function(e) {
-                    // Nếu chưa có thẻ img preview thì tạo mới (trường hợp thêm mới)
-                    if (!preview) {
-                        const img = document.createElement('img');
-                        img.id = 'imagePreview';
-                        img.style.maxHeight = '200px';
-                        img.style.maxWidth = '100%';
-                        img.className = 'rounded';
-                        img.src = e.target.result;
-                        input.closest('.card').querySelector('.text-center').appendChild(img);
-                        
-                        // Ẩn placeholder cũ
-                        if(placeholder) placeholder.style.display = 'none';
-                        if(noImageText) noImageText.style.display = 'none';
-                    } else {
-                        preview.src = e.target.result;
-                        preview.style.display = 'block';
-                        if(placeholder) placeholder.style.display = 'none';
-                        if(noImageText) noImageText.style.display = 'none';
-                    }
-                }
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
+    <!-- FORM -->
+    <form th:action="@{/admin/products/save}" th:object="${product}"
+          method="post" enctype="multipart/form-data">
 
-        // 2. Preview khi nhập URL
-        function previewUrl(url) {
-            const preview = document.getElementById('imagePreview');
-            const placeholder = document.getElementById('placeholderImage');
-            const noImageText = document.getElementById('noImageText');
-            const container = document.querySelector('.card .text-center');
+        <input type="hidden" th:field="*{id}">
 
-            if (url.trim() !== "") {
-                if (!preview) {
-                    const img = document.createElement('img');
-                    img.id = 'imagePreview';
-                    img.style.maxHeight = '200px';
-                    img.style.maxWidth = '100%';
-                    img.className = 'rounded';
-                    img.src = url;
-                    // Xử lý lỗi ảnh chết
-                    img.onerror = function() { this.src = 'https://via.placeholder.com/150?text=Lỗi+Ảnh'; };
-                    
-                    container.appendChild(img);
-                    
-                    if(placeholder) placeholder.style.display = 'none';
-                    if(noImageText) noImageText.style.display = 'none';
-                } else {
-                    preview.src = url;
-                    preview.style.display = 'block';
-                    preview.onerror = function() { this.src = 'https://via.placeholder.com/150?text=Lỗi+Ảnh'; };
-                    
-                    if(placeholder) placeholder.style.display = 'none';
-                    if(noImageText) noImageText.style.display = 'none';
-                }
-            }
+        <div class="row g-4">
+
+            <!-- ===== CỘT TRÁI (8/12) ===== -->
+            <div class="col-lg-8">
+
+                <!-- Thông tin cơ bản -->
+                <div class="section-card">
+                    <div class="section-title">
+                        <i class="bi bi-info-circle-fill"></i> Thông tin cơ bản
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Tên sản phẩm <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" th:field="*{tenSanPham}"
+                               placeholder="Ví dụ: Chuột Logitech G502 Hero" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Slug (Đường dẫn URL) <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text">/products/</span>
+                            <input type="text" class="form-control" th:field="*{slug}"
+                                   placeholder="vi-du-logitech-g502" required>
+                        </div>
+                        <small class="text-muted">Không dấu, dùng dấu gạch ngang -</small>
+                    </div>
+                    <div class="mb-0">
+                        <label class="form-label fw-bold">Mô tả / Thông số kỹ thuật</label>
+                        <textarea class="form-control" th:field="*{thongSo}" rows="5"
+                                  placeholder="Mô tả chi tiết, thông số kỹ thuật..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Giá & Tồn kho -->
+                <div class="section-card">
+                    <div class="section-title">
+                        <i class="bi bi-cash-stack"></i> Giá bán & Tồn kho
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Giá bán (VNĐ) <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" th:field="*{giaSanPham}"
+                                   placeholder="0" min="0" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Giảm giá (%)</label>
+                            <input type="number" class="form-control" th:field="*{chietKhau}"
+                                   placeholder="0" min="0" max="100">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Số lượng tồn <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" th:field="*{tonKho}"
+                                   placeholder="0" min="0" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NÚT LƯU - nằm trong cột trái, luôn hiển thị -->
+                <div class="section-card">
+                    <div class="d-flex gap-3 align-items-center">
+                        <button type="submit" class="btn-save">
+                            <i class="bi bi-save me-2"></i>
+                            <span th:text="${product.id == null ? 'Thêm sản phẩm' : 'Lưu thay đổi'}">Lưu</span>
+                        </button>
+                        <a href="/admin/products" class="btn-cancel">
+                            <i class="bi bi-x-circle"></i> Hủy
+                        </a>
+                        <span th:if="${product.id != null}" class="text-muted small ms-auto">
+                            ID: #<span th:text="${product.id}"></span>
+                        </span>
+                    </div>
+                </div>
+
+            </div><!-- /col-lg-8 -->
+
+            <!-- ===== CỘT PHẢI (4/12) ===== -->
+            <div class="col-lg-4">
+                <div class="sticky-sidebar">
+
+                    <!-- Hình ảnh -->
+                    <div class="section-card">
+                        <div class="section-title">
+                            <i class="bi bi-image-fill"></i> Hình ảnh sản phẩm
+                        </div>
+
+                        <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="upload-tab"
+                                        data-bs-toggle="pill" data-bs-target="#pills-upload"
+                                        type="button" role="tab"
+                                        th:classappend="${product.hinhAnh == null or not #strings.startsWith(product.hinhAnh,'http')} ? ' active' : ''">
+                                    <i class="bi bi-cloud-upload me-1"></i>Upload
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="url-tab"
+                                        data-bs-toggle="pill" data-bs-target="#pills-url"
+                                        type="button" role="tab"
+                                        th:classappend="${product.hinhAnh != null and #strings.startsWith(product.hinhAnh,'http')} ? ' active' : ''">
+                                    <i class="bi bi-link-45deg me-1"></i>URL
+                                </button>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content mb-3" id="pills-tabContent">
+                            <!-- Tab Upload -->
+                            <div class="tab-pane fade" id="pills-upload" role="tabpanel"
+                                 th:classappend="${product.hinhAnh == null or not #strings.startsWith(product.hinhAnh,'http')} ? ' show active' : ''">
+                                <input type="file" name="imageFile" id="imageFileInput"
+                                       class="form-control" accept="image/*"
+                                       onchange="previewImage(this)">
+                                <small class="text-muted d-block mt-1">jpg, png, webp (tối đa 5MB)</small>
+                            </div>
+                            <!-- Tab URL -->
+                            <div class="tab-pane fade" id="pills-url" role="tabpanel"
+                                 th:classappend="${product.hinhAnh != null and #strings.startsWith(product.hinhAnh,'http')} ? ' show active' : ''">
+                                <input type="text" name="imageUrl" id="imageUrlInput"
+                                       class="form-control"
+                                       placeholder="https://i.imgur.com/example.jpg"
+                                       th:value="${product.hinhAnh != null and #strings.startsWith(product.hinhAnh,'http') ? product.hinhAnh : ''}"
+                                       oninput="previewUrl(this.value)">
+                                <small class="text-muted d-block mt-1">Dán link ảnh từ web vào đây</small>
+                            </div>
+                        </div>
+
+                        <!-- Preview ảnh -->
+                        <div class="image-drop-zone" id="imageDropZone">
+                            <img id="imagePreview"
+                                 th:if="${product.hinhAnh != null}"
+                                 th:src="${#strings.startsWith(product.hinhAnh,'http')
+                                          ? product.hinhAnh
+                                          : '/images/products/' + product.hinhAnh}"
+                                 style="max-height:180px;max-width:100%;border-radius:8px;"
+                                 onerror="this.src='https://placehold.co/300x200/f8f9fa/dc3545?text=Lỗi+ảnh'">
+                            <div th:if="${product.hinhAnh == null}" id="placeholderBox" class="text-center p-4">
+                                <i class="bi bi-image" style="font-size:2.5rem;color:#dde1ea;display:block;margin-bottom:8px;"></i>
+                                <span style="font-size:0.8rem;color:#aaa;">Chưa có ảnh</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Phân loại -->
+                    <div class="section-card">
+                        <div class="section-title">
+                            <i class="bi bi-tags-fill"></i> Phân loại
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Thương hiệu</label>
+                            <select class="form-select" th:field="*{hang}">
+                                <option value="">-- Chọn thương hiệu --</option>
+                                <option th:each="h : ${brands}"
+                                        th:value="${h.id}"
+                                        th:text="${h.tenHang}"
+                                        th:selected="${product.hang != null and product.hang.id == h.id}">
+                                </option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label fw-bold">Danh mục</label>
+                            <small class="text-muted d-block mb-2">
+                                <i class="bi bi-info-circle me-1"></i>Giữ <kbd>Ctrl</kbd> để chọn nhiều
+                            </small>
+                            <select class="form-select" th:field="*{loaiSanPhams}" multiple size="5">
+                                <option th:each="c : ${categories}"
+                                        th:value="${c.id}"
+                                        th:text="${c.ten}"
+                                        th:selected="${product.loaiSanPhams != null and product.loaiSanPhams.contains(c)}">
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                </div><!-- /sticky-sidebar -->
+            </div><!-- /col-lg-4 -->
+
+        </div><!-- /row -->
+    </form>
+
+</th:block>
+
+<th:block layout:fragment="scripts">
+<script>
+    // ===== PREVIEW ẢNH TỪ FILE =====
+    function previewImage(input) {
+        if (!input.files || !input.files[0]) return;
+        const urlInput = document.getElementById('imageUrlInput');
+        if (urlInput) urlInput.value = '';
+        const reader = new FileReader();
+        reader.onload = function(e) { updatePreview(e.target.result); };
+        reader.readAsDataURL(input.files[0]);
+    }
+
+    // ===== PREVIEW ẢNH TỪ URL =====
+    function previewUrl(url) {
+        if (!url || url.trim() === '') return;
+        const fileInput = document.getElementById('imageFileInput');
+        if (fileInput) fileInput.value = '';
+        updatePreview(url.trim());
+    }
+
+    // ===== UPDATE PREVIEW =====
+    function updatePreview(src) {
+        const dropZone = document.getElementById('imageDropZone');
+        let preview = document.getElementById('imagePreview');
+        const placeholder = document.getElementById('placeholderBox');
+
+        if (!preview) {
+            preview = document.createElement('img');
+            preview.id = 'imagePreview';
+            preview.style.cssText = 'max-height:180px;max-width:100%;border-radius:8px;';
+            dropZone.appendChild(preview);
         }
-    </script>
+        preview.src = src;
+        preview.style.display = 'block';
+        preview.onerror = function() {
+            this.src = 'https://placehold.co/300x200/f8f9fa/dc3545?text=Lỗi+ảnh';
+        };
+        if (placeholder) placeholder.style.display = 'none';
+    }
+
+    // ===== AUTO SLUG (chỉ khi thêm mới) =====
+    document.addEventListener('DOMContentLoaded', function() {
+        const nameInput = document.querySelector('[name="tenSanPham"]');
+        const slugInput = document.querySelector('[name="slug"]');
+        const idInput = document.querySelector('input[name="id"]');
+
+        if (nameInput && slugInput && (!idInput || !idInput.value)) {
+            nameInput.addEventListener('input', function() {
+                slugInput.value = convertToSlug(this.value);
+            });
+        }
+    });
+
+    function convertToSlug(text) {
+        const map = {
+            'à':'a','á':'a','ả':'a','ã':'a','ạ':'a',
+            'ă':'a','ằ':'a','ắ':'a','ẳ':'a','ẵ':'a','ặ':'a',
+            'â':'a','ầ':'a','ấ':'a','ẩ':'a','ẫ':'a','ậ':'a',
+            'è':'e','é':'e','ẻ':'e','ẽ':'e','ẹ':'e',
+            'ê':'e','ề':'e','ế':'e','ể':'e','ễ':'e','ệ':'e',
+            'ì':'i','í':'i','ỉ':'i','ĩ':'i','ị':'i',
+            'ò':'o','ó':'o','ỏ':'o','õ':'o','ọ':'o',
+            'ô':'o','ồ':'o','ố':'o','ổ':'o','ỗ':'o','ộ':'o',
+            'ơ':'o','ờ':'o','ớ':'o','ở':'o','ỡ':'o','ợ':'o',
+            'ù':'u','ú':'u','ủ':'u','ũ':'u','ụ':'u',
+            'ư':'u','ừ':'u','ứ':'u','ử':'u','ữ':'u','ự':'u',
+            'ỳ':'y','ý':'y','ỷ':'y','ỹ':'y','ỵ':'y','đ':'d'
+        };
+        return text.toLowerCase()
+            .split('').map(c => map[c] || c).join('')
+            .replace(/[^a-z0-9\s-]/g, '')
+            .replace(/\s+/g, '-')
+            .replace(/-+/g, '-')
+            .trim();
+    }
+</script>
+</th:block>
 </body>
 </html>

@@ -14,58 +14,68 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 @Controller
-@RequestMapping("/admin/products") // Gom nhóm URL bắt đầu bằng /admin/products
+@RequestMapping("/admin/products")
 public class AdminProductController {
 
     @Autowired
     private SanPhamService sanPhamService;
-    
+
     @Autowired
     private HangRepository hangRepository;
-    
+
     @Autowired
     private LoaiSanPhamRepository loaiSanPhamRepository;
 
-    // 1. Xem danh sách
+    // 1. Danh sách
     @GetMapping("")
-    public String index(Model model, @RequestParam(name = "page", defaultValue = "0") int page) {
-        Page<SanPham> pageProduct = sanPhamService.getAllProducts(null, null, page);
+    public String index(Model model,
+                        @RequestParam(name = "page", defaultValue = "0") int page,
+                        @RequestParam(name = "keyword", required = false) String keyword) {
+        Page<SanPham> pageProduct = sanPhamService.getAllProducts(keyword, null, page);
         model.addAttribute("products", pageProduct);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", pageProduct.getTotalPages());
-        return "admin/product/index"; // Trả về giao diện danh sách
+        model.addAttribute("keyword", keyword);
+        return "admin/product/index";
     }
 
-    // 2. Hiện form thêm mới
+    // 2. Form thêm mới
     @GetMapping("/create")
     public String create(Model model) {
-        model.addAttribute("product", new SanPham()); // Object rỗng
-        model.addAttribute("brands", hangRepository.findAll()); // List hãng
-        model.addAttribute("categories", loaiSanPhamRepository.findAll()); // List loại
-        return "admin/product/form"; // Trả về giao diện form
+        model.addAttribute("product", new SanPham());
+        model.addAttribute("brands", hangRepository.findAll());
+        model.addAttribute("categories", loaiSanPhamRepository.findAll());
+        return "admin/product/form";
     }
 
-    // 3. Xử lý lưu (Thêm mới hoặc Cập nhật)
+    // 3. Lưu (Thêm mới hoặc Cập nhật)
     @PostMapping("/save")
-    public String save(@ModelAttribute("product") SanPham sanPham,
-                       @RequestParam("imageFile") MultipartFile imageFile,
-                       @RequestParam("imageUrl") String imageUrl) throws IOException { // Thêm tham số imageUrl
-        
-        // Logic giữ ảnh cũ: Nếu không up ảnh mới VÀ không nhập URL mới -> Lấy lại ảnh cũ
-        if (sanPham.getId() != null && imageFile.isEmpty() && (imageUrl == null || imageUrl.isEmpty())) {
-            SanPham oldProduct = sanPhamService.getProductById(sanPham.getId());
-            if (oldProduct != null) {
-                sanPham.setHinhAnh(oldProduct.getHinhAnh());
+    public String save(
+            @ModelAttribute("product") SanPham sanPham,
+            // ✅ required = false để không báo lỗi khi không chọn file
+            @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
+            @RequestParam(value = "imageUrl", required = false) String imageUrl
+    ) throws IOException {
+
+        // Giữ ảnh cũ nếu không upload file mới VÀ không nhập URL mới
+        if (sanPham.getId() != null) {
+            boolean noNewFile = (imageFile == null || imageFile.isEmpty());
+            boolean noNewUrl  = (imageUrl == null || imageUrl.trim().isEmpty());
+
+            if (noNewFile && noNewUrl) {
+                // Lấy ảnh cũ từ DB
+                SanPham oldProduct = sanPhamService.getProductById(sanPham.getId());
+                if (oldProduct != null) {
+                    sanPham.setHinhAnh(oldProduct.getHinhAnh());
+                }
             }
         }
-        
-        // Gọi service với 3 tham số
+
         sanPhamService.saveProduct(sanPham, imageFile, imageUrl);
-        
         return "redirect:/admin/products";
     }
 
-    // 4. Hiện form sửa
+    // 4. Form sửa
     @GetMapping("/edit/{id}")
     public String edit(@PathVariable Long id, Model model) {
         SanPham sanPham = sanPhamService.getProductById(id);
@@ -75,7 +85,7 @@ public class AdminProductController {
         model.addAttribute("product", sanPham);
         model.addAttribute("brands", hangRepository.findAll());
         model.addAttribute("categories", loaiSanPhamRepository.findAll());
-        return "admin/product/form"; // Tái sử dụng form
+        return "admin/product/form";
     }
 
     // 5. Xóa
