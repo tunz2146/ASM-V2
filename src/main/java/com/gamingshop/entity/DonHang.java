@@ -38,7 +38,7 @@ public class DonHang {
     private NguoiDung nguoiDung;
 
     @OneToMany(mappedBy = "donHang", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<ChiTietDonHang> chiTietDonHangs;
+    private List<ChiTietDonHang> chiTietDonHangs = new java.util.ArrayList<>();
 
     // ===== GETTERS & SETTERS =====
     public Long getId() { return id; }

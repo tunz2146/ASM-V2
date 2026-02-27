@@ -29,10 +29,8 @@ public class DonHangService {
         List<GioHang> cartItems = gioHangRepository.findByNguoiDung_Id(user.getId());
         if (cartItems.isEmpty()) throw new RuntimeException("Giỏ hàng trống!");
 
-        long tongTien = cartItems.stream()
-                .mapToLong(GioHang::getThanhTien)
-                .sum();
-        long phiVC = tongTien >= 1_000_000 ? 0L : 30_000L;
+        long tongTien = cartItems.stream().mapToLong(GioHang::getThanhTien).sum();
+        long phiVC    = tongTien >= 1_000_000 ? 0L : 30_000L;
 
         DonHang donHang = new DonHang();
         donHang.setNguoiDung(user);
@@ -56,7 +54,6 @@ public class DonHangService {
             saved.getChiTietDonHangs().add(ct);
         }
         donHangRepository.save(saved);
-
         gioHangRepository.deleteByNguoiDung_Id(user.getId());
         return saved;
     }
@@ -85,18 +82,12 @@ public class DonHangService {
 
     // ============================================================
     // ADMIN: Quản lý đơn hàng
-    // ✅ KEY FIX: Chỉ truyền Sort vào Pageable
-    //    KHÔNG dùng findByXxxOrderByYyyDesc() vì Hibernate sẽ
-    //    ghép thêm ORDER BY thứ 2 → lỗi "column specified more than once"
     // ============================================================
     public Page<DonHang> getAllOrders(String status, int page) {
         Pageable pageable = PageRequest.of(page, 15, Sort.by(Sort.Direction.DESC, "ngayDat"));
-
         if (status != null && !status.isEmpty()) {
-            // findByTinhTrang + Pageable(Sort) → chỉ 1 ORDER BY
             return donHangRepository.findByTinhTrang(status, pageable);
         }
-        // findAll + Pageable(Sort) → chỉ 1 ORDER BY
         return donHangRepository.findAll(pageable);
     }
 
@@ -109,7 +100,9 @@ public class DonHangService {
         return true;
     }
 
-    // Thống kê
+    // ============================================================
+    // ADMIN: Thống kê
+    // ============================================================
     public long countByStatus(String status) {
         return donHangRepository.countByTinhTrang(status);
     }
@@ -120,5 +113,15 @@ public class DonHangService {
 
     public long countAll() {
         return donHangRepository.count();
+    }
+
+    // ✅ THÊM MỚI: Đếm đơn hàng theo userId (dùng cho trang chi tiết khách hàng)
+    public long countByUserId(Long userId) {
+        return donHangRepository.findByNguoiDung_IdOrderByNgayDatDesc(userId).size();
+    }
+
+    // ✅ THÊM MỚI: Lấy danh sách đơn hàng theo userId
+    public List<DonHang> getOrdersByUserId(Long userId) {
+        return donHangRepository.findByNguoiDung_IdOrderByNgayDatDesc(userId);
     }
 }

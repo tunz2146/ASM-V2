@@ -26,20 +26,21 @@ public class AdminOrderController {
 
         Page<DonHang> orders = donHangService.getAllOrders(status, page);
 
-        model.addAttribute("orders", orders);
-        model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", orders.getTotalPages());
-        model.addAttribute("currentStatus", status);
-        model.addAttribute("pageTitle", "Quản lý đơn hàng");
+        model.addAttribute("orders",       orders);
+        model.addAttribute("currentPage",  page);
+        model.addAttribute("totalPages",   orders.getTotalPages());
+        model.addAttribute("currentStatus",status);
+        model.addAttribute("pageTitle",    "Quản lý đơn hàng");
 
-        // Thống kê nhanh
-        model.addAttribute("countAll",        donHangService.countAll());
-        model.addAttribute("countCho",        donHangService.countByStatus("CHO_XAC_NHAN"));
-        model.addAttribute("countXacNhan",    donHangService.countByStatus("DA_XAC_NHAN"));
-        model.addAttribute("countDangGiao",   donHangService.countByStatus("DANG_GIAO"));
-        model.addAttribute("countDaGiao",     donHangService.countByStatus("DA_GIAO"));
-        model.addAttribute("countHuy",        donHangService.countByStatus("DA_HUY"));
-        model.addAttribute("tongDoanhThu",    donHangService.getTotalRevenue());
+        long pending = donHangService.countByStatus("CHO_XAC_NHAN");
+        model.addAttribute("countAll",       donHangService.countAll());
+        model.addAttribute("countCho",       pending);
+        model.addAttribute("countXacNhan",   donHangService.countByStatus("DA_XAC_NHAN"));
+        model.addAttribute("countDangGiao",  donHangService.countByStatus("DANG_GIAO"));
+        model.addAttribute("countDaGiao",    donHangService.countByStatus("DA_GIAO"));
+        model.addAttribute("countHuy",       donHangService.countByStatus("DA_HUY"));
+        model.addAttribute("tongDoanhThu",   donHangService.getTotalRevenue());
+        model.addAttribute("pendingOrders",  pending); // badge sidebar
 
         return "admin/order/index";
     }
@@ -50,8 +51,9 @@ public class AdminOrderController {
         DonHang order = donHangService.getOrderById(id);
         if (order == null) return "redirect:/admin/orders";
 
-        model.addAttribute("order", order);
-        model.addAttribute("pageTitle", "Đơn hàng #" + id);
+        model.addAttribute("order",         order);
+        model.addAttribute("pageTitle",     "Đơn hàng #GS-" + id);
+        model.addAttribute("pendingOrders", donHangService.countByStatus("CHO_XAC_NHAN"));
         return "admin/order/detail";
     }
 
@@ -64,12 +66,13 @@ public class AdminOrderController {
         if (ok) {
             DonHang dh = donHangService.getOrderById(id);
             return ResponseEntity.ok(Map.of(
-                "success", true,
-                "message", "Cập nhật thành công",
+                "success",   true,
+                "message",   "Cập nhật thành công",
                 "newStatus", dh.getTinhTrangLabel(),
                 "newBadge",  dh.getTinhTrangBadge()
             ));
         }
-        return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Lỗi cập nhật"));
+        return ResponseEntity.badRequest().body(
+            Map.of("success", false, "message", "Lỗi cập nhật"));
     }
 }

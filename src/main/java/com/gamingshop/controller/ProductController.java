@@ -47,7 +47,7 @@ public class ProductController {
             model.addAttribute("pageTitle", "Tất cả sản phẩm");
         }
 
-        return "admin/product/list";
+        return "product/list";
     }
 
     // ===== CHI TIẾT SẢN PHẨM =====

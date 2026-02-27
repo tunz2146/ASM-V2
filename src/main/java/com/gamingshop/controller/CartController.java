@@ -122,12 +122,5 @@ public class CartController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/checkout")
-    public String checkout(Model model, Authentication auth) {
-        String email = auth.getName();
-            model.addAttribute("cartItems", gioHangService.getCartByEmail(email));
-            model.addAttribute("totalAmount", gioHangService.getTotalAmount(email));
-            model.addAttribute("pageTitle", "Thanh toán - Gaming Shop");
-    return "checkout";
-}
+    
 }

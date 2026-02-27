@@ -2,337 +2,241 @@
 <html lang="vi"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/base}">
+      layout:decorate="~{layout/admin-base}">
 <head>
     <title>Quản lý đơn hàng</title>
-    <th:block layout:fragment="css">
+    <th:block layout:fragment="admin-styles">
     <style>
-        :root { --red:#dc3545; --dark:#0d1117; --dark2:#1a1a2e; }
-
-        /* STAT CARDS */
-        .stat-card {
-            border-radius: 14px; border: none;
-            transition: transform .25s, box-shadow .25s;
-            cursor: pointer; text-decoration: none; display: block;
-        }
-        .stat-card:hover { transform: translateY(-4px); box-shadow: 0 10px 28px rgba(0,0,0,.12); }
-        .stat-card .s-num  { font-size: 2rem; font-weight: 900; line-height: 1; }
-        .stat-card .s-label{ font-size: .8rem; opacity: .85; margin-top: 4px; }
-        .stat-card .s-ico  { font-size: 2.2rem; opacity: .25; }
-
-        /* FILTER TABS */
-        .filter-tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+        .filter-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px; }
         .filter-tab {
-            padding: 6px 16px; border-radius: 50px; font-size: .83rem; font-weight: 600;
-            border: 1.5px solid #e0e0e0; background: #fff; color: #666;
-            text-decoration: none; transition: all .2s; cursor: pointer;
+            padding: 7px 16px; border-radius: 50px;
+            border: 1.5px solid #e0e3ea;
+            background: #fff; color: #666;
+            font-size: 0.8rem; font-weight: 600;
+            cursor: pointer; text-decoration: none;
+            transition: all 0.2s; white-space: nowrap;
         }
-        .filter-tab:hover,
-        .filter-tab.active { background: var(--red); border-color: var(--red); color: #fff; }
+        .filter-tab:hover  { border-color: #dc3545; color: #dc3545; }
+        .filter-tab.active { background: #dc3545; border-color: #dc3545; color: #fff; }
+        .filter-tab .tab-count {
+            background: rgba(255,255,255,0.25);
+            padding: 1px 7px; border-radius: 50px;
+            font-size: 0.72rem; margin-left: 4px;
+        }
+        .filter-tab:not(.active) .tab-count { background: #f0f2f7; color: #888; }
 
-        /* TABLE */
-        .orders-table { border-collapse: separate; border-spacing: 0; width: 100%; }
-        .orders-table thead th {
-            background: #f8f9fa; padding: 12px 16px;
-            font-size: .8rem; font-weight: 700; color: #888;
-            text-transform: uppercase; letter-spacing: .5px;
-            border-bottom: 2px solid #f0f0f0; white-space: nowrap;
-        }
-        .orders-table tbody tr {
-            transition: background .15s;
-        }
-        .orders-table tbody tr:hover { background: #fff8f8; }
-        .orders-table tbody td {
-            padding: 13px 16px; border-bottom: 1px solid #f5f5f5;
-            font-size: .88rem; vertical-align: middle;
-        }
-        .order-id { font-weight: 800; color: var(--dark2); }
-        .customer-name { font-weight: 600; color: var(--dark2); }
-        .customer-email { font-size: .77rem; color: #aaa; }
+        .order-row td:first-child { font-weight: 700; color: #dc3545; }
+        .order-row:hover { background: #fafbfd !important; }
 
-        /* STATUS BADGE */
-        .status-badge {
-            display: inline-flex; align-items: center; gap: 5px;
-            padding: 4px 12px; border-radius: 50px;
-            font-size: .77rem; font-weight: 700;
-        }
-        .status-badge::before {
-            content: ''; width: 7px; height: 7px; border-radius: 50%;
-            background: currentColor; opacity: .7;
-        }
-        .status-CHO_XAC_NHAN { background: #fff8e1; color: #f57c00; }
-        .status-DA_XAC_NHAN  { background: #e3f2fd; color: #1565c0; }
-        .status-DANG_GIAO    { background: #e0f7fa; color: #00838f; }
-        .status-DA_GIAO      { background: #e8f5e9; color: #2e7d32; }
-        .status-DA_HUY       { background: #fce4ec; color: #c62828; }
+        .empty-state { text-align: center; padding: 70px 20px; }
+        .empty-state i { font-size: 3.5rem; color: #d0d5e0; display: block; margin-bottom: 16px; }
+        .empty-state h5 { color: #888; font-size: 1rem; }
 
-        /* STATUS SELECT */
-        .status-select {
-            border: 1.5px solid #e0e0e0; border-radius: 8px;
-            padding: 5px 10px; font-size: .82rem; cursor: pointer;
-            background: #fff; transition: border-color .2s; outline: none;
+        .select-status {
+            border: 1.5px solid #e0e3ea; border-radius: 8px;
+            padding: 6px 10px; font-size: 0.82rem; font-weight: 500;
+            background: #fff; cursor: pointer; outline: none;
+            transition: border-color 0.2s;
         }
-        .status-select:focus { border-color: var(--red); }
+        .select-status:focus { border-color: #dc3545; }
 
-        /* ACTION BUTTONS */
-        .btn-view {
-            padding: 5px 14px; border-radius: 8px;
-            background: var(--dark2); color: #fff;
-            border: none; font-size: .8rem; font-weight: 600;
-            text-decoration: none; transition: all .2s;
-        }
-        .btn-view:hover { background: #111827; color: #fff; }
-
-        /* EMPTY STATE */
-        .empty-state { text-align: center; padding: 60px 20px; color: #bbb; }
-        .empty-state i { font-size: 4rem; display: block; margin-bottom: 16px; }
-
-        /* TOAST */
         #adminToast {
-            position: fixed; top: 76px; right: 18px; z-index: 9999;
-            min-width: 260px; border-radius: 12px; padding: 12px 18px;
-            display: flex; align-items: center; gap: 10px; font-weight: 500;
-            box-shadow: 0 6px 28px rgba(0,0,0,.15);
-            transform: translateX(130%); transition: transform .4s cubic-bezier(.175,.885,.32,1.275);
+            position: fixed; top: 72px; right: 20px; z-index: 9999;
+            min-width: 240px; padding: 12px 18px; border-radius: 12px;
+            display: flex; align-items: center; gap: 10px;
+            font-size: 0.87rem; font-weight: 600;
+            box-shadow: 0 6px 28px rgba(0,0,0,0.12);
+            transform: translateX(130%); transition: transform 0.4s cubic-bezier(.175,.885,.32,1.275);
         }
         #adminToast.show { transform: translateX(0); }
-        #adminToast.ok   { background: #28a745; color: #fff; }
-        #adminToast.err  { background: var(--red); color: #fff; }
+        #adminToast.ok  { background: #22c55e; color: #fff; }
+        #adminToast.err { background: #dc3545; color: #fff; }
     </style>
     </th:block>
 </head>
 <body>
 <th:block layout:fragment="content">
 
-    <div class="container-fluid py-4 px-4">
+    <!-- Toast -->
+    <div id="adminToast"><i class="bi bi-check-circle-fill"></i><span id="toastMsg">OK</span></div>
 
-        <!-- HEADER -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <h2 class="fw-bold mb-1" style="color:#1a1a2e;">
-                    <i class="bi bi-receipt-cutoff text-danger me-2"></i>Quản lý đơn hàng
-                </h2>
-                <p class="text-muted mb-0 small">Xem, duyệt và cập nhật trạng thái đơn hàng</p>
-            </div>
-            <a href="/admin/dashboard" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
-                <i class="bi bi-arrow-left me-1"></i>Dashboard
+    <!-- Header -->
+    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
+        <div>
+            <h3 class="fw-bold mb-1" style="color:#1a1a2e;">
+                <i class="bi bi-receipt-cutoff text-danger me-2"></i>Quản lý đơn hàng
+            </h3>
+            <p class="text-muted mb-0 small">Xem, duyệt và cập nhật trạng thái đơn hàng</p>
+        </div>
+    </div>
+
+    <!-- Stat row -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-4 col-lg-2">
+            <a th:href="@{/admin/orders}" class="stat-card p-3">
+                <div class="stat-value" style="font-size:1.4rem;" th:text="${countAll}">0</div>
+                <div class="stat-label">Tất cả</div>
             </a>
         </div>
-
-        <!-- STAT CARDS -->
-        <div class="row g-3 mb-4">
-            <div class="col-6 col-md-4 col-lg-2">
-                <a th:href="@{/admin/orders}" class="stat-card card p-3 shadow-sm text-dark">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <div class="s-num" th:text="${countAll}">0</div>
-                            <div class="s-label">Tất cả</div>
-                        </div>
-                        <i class="bi bi-list-ul s-ico"></i>
-                    </div>
-                </a>
-            </div>
-            <div class="col-6 col-md-4 col-lg-2">
-                <a th:href="@{/admin/orders(status='CHO_XAC_NHAN')}" class="stat-card card p-3 shadow-sm" style="background:#fff8e1;color:#f57c00;">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <div class="s-num" th:text="${countCho}">0</div>
-                            <div class="s-label">Chờ duyệt</div>
-                        </div>
-                        <i class="bi bi-hourglass-split s-ico"></i>
-                    </div>
-                </a>
-            </div>
-            <div class="col-6 col-md-4 col-lg-2">
-                <a th:href="@{/admin/orders(status='DA_XAC_NHAN')}" class="stat-card card p-3 shadow-sm" style="background:#e3f2fd;color:#1565c0;">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <div class="s-num" th:text="${countXacNhan}">0</div>
-                            <div class="s-label">Đã xác nhận</div>
-                        </div>
-                        <i class="bi bi-check-circle s-ico"></i>
-                    </div>
-                </a>
-            </div>
-            <div class="col-6 col-md-4 col-lg-2">
-                <a th:href="@{/admin/orders(status='DANG_GIAO')}" class="stat-card card p-3 shadow-sm" style="background:#e0f7fa;color:#00838f;">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <div class="s-num" th:text="${countDangGiao}">0</div>
-                            <div class="s-label">Đang giao</div>
-                        </div>
-                        <i class="bi bi-truck s-ico"></i>
-                    </div>
-                </a>
-            </div>
-            <div class="col-6 col-md-4 col-lg-2">
-                <a th:href="@{/admin/orders(status='DA_GIAO')}" class="stat-card card p-3 shadow-sm" style="background:#e8f5e9;color:#2e7d32;">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <div class="s-num" th:text="${countDaGiao}">0</div>
-                            <div class="s-label">Đã giao</div>
-                        </div>
-                        <i class="bi bi-bag-check s-ico"></i>
-                    </div>
-                </a>
-            </div>
-            <div class="col-6 col-md-4 col-lg-2">
-                <div class="stat-card card p-3 shadow-sm" style="background:linear-gradient(135deg,#dc3545,#c82333);color:#fff;">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <div class="s-num" style="font-size:1.2rem;"
-                                 th:text="${#numbers.formatInteger(tongDoanhThu, 0, 'COMMA') + '₫'}">0₫</div>
-                            <div class="s-label">Doanh thu</div>
-                        </div>
-                        <i class="bi bi-currency-dollar s-ico"></i>
-                    </div>
-                </div>
-            </div>
+        <div class="col-6 col-md-4 col-lg-2">
+            <a th:href="@{/admin/orders(status='CHO_XAC_NHAN')}" class="stat-card p-3">
+                <div class="stat-value" style="font-size:1.4rem;color:#f59e0b;" th:text="${countCho}">0</div>
+                <div class="stat-label">Chờ duyệt</div>
+            </a>
         </div>
-
-        <!-- FILTER TABS -->
-        <div class="card border-0 shadow-sm mb-3 p-3">
-            <div class="filter-tabs">
-                <a th:href="@{/admin/orders}"
-                   class="filter-tab" th:classappend="${currentStatus == null} ? 'active'">
-                    <i class="bi bi-grid me-1"></i>Tất cả
-                </a>
-                <a th:href="@{/admin/orders(status='CHO_XAC_NHAN')}"
-                   class="filter-tab" th:classappend="${currentStatus == 'CHO_XAC_NHAN'} ? 'active'">
-                    <i class="bi bi-hourglass-split me-1"></i>Chờ xác nhận
-                    <span class="badge bg-warning text-dark ms-1" th:text="${countCho}">0</span>
-                </a>
-                <a th:href="@{/admin/orders(status='DA_XAC_NHAN')}"
-                   class="filter-tab" th:classappend="${currentStatus == 'DA_XAC_NHAN'} ? 'active'">
-                    <i class="bi bi-check-circle me-1"></i>Đã xác nhận
-                </a>
-                <a th:href="@{/admin/orders(status='DANG_GIAO')}"
-                   class="filter-tab" th:classappend="${currentStatus == 'DANG_GIAO'} ? 'active'">
-                    <i class="bi bi-truck me-1"></i>Đang giao
-                </a>
-                <a th:href="@{/admin/orders(status='DA_GIAO')}"
-                   class="filter-tab" th:classappend="${currentStatus == 'DA_GIAO'} ? 'active'">
-                    <i class="bi bi-bag-check me-1"></i>Đã giao
-                </a>
-                <a th:href="@{/admin/orders(status='DA_HUY')}"
-                   class="filter-tab" th:classappend="${currentStatus == 'DA_HUY'} ? 'active'">
-                    <i class="bi bi-x-circle me-1"></i>Đã hủy
-                </a>
-            </div>
+        <div class="col-6 col-md-4 col-lg-2">
+            <a th:href="@{/admin/orders(status='DA_XAC_NHAN')}" class="stat-card p-3">
+                <div class="stat-value" style="font-size:1.4rem;color:#3b82f6;" th:text="${countXacNhan}">0</div>
+                <div class="stat-label">Đã xác nhận</div>
+            </a>
         </div>
+        <div class="col-6 col-md-4 col-lg-2">
+            <a th:href="@{/admin/orders(status='DANG_GIAO')}" class="stat-card p-3">
+                <div class="stat-value" style="font-size:1.4rem;color:#0891b2;" th:text="${countDangGiao}">0</div>
+                <div class="stat-label">Đang giao</div>
+            </a>
+        </div>
+        <div class="col-6 col-md-4 col-lg-2">
+            <a th:href="@{/admin/orders(status='DA_GIAO')}" class="stat-card p-3">
+                <div class="stat-value" style="font-size:1.4rem;color:#16a34a;" th:text="${countDaGiao}">0</div>
+                <div class="stat-label">Đã giao</div>
+            </a>
+        </div>
+        <div class="col-6 col-md-4 col-lg-2">
+            <a th:href="@{/admin/orders(status='DA_HUY')}" class="stat-card p-3">
+                <div class="stat-value" style="font-size:1.4rem;color:#dc3545;" th:text="${countHuy}">0</div>
+                <div class="stat-label">Đã hủy</div>
+            </a>
+        </div>
+    </div>
 
-        <!-- TABLE -->
-        <div class="card border-0 shadow-sm">
-            <div class="card-body p-0">
-                <div th:if="${orders.empty}" class="empty-state">
-                    <i class="bi bi-inbox text-muted"></i>
-                    <p class="fw-semibold">Không có đơn hàng nào</p>
-                    <p class="small text-muted">Chưa có đơn hàng trong trạng thái này</p>
-                </div>
+    <!-- Filter tabs -->
+    <div class="filter-tabs">
+        <a th:href="@{/admin/orders}" class="filter-tab" th:classappend="${currentStatus == null} ? 'active' : ''">
+            Tất cả <span class="tab-count" th:text="${countAll}">0</span>
+        </a>
+        <a th:href="@{/admin/orders(status='CHO_XAC_NHAN')}" class="filter-tab"
+           th:classappend="${currentStatus == 'CHO_XAC_NHAN'} ? 'active' : ''">
+            ⏳ Chờ xác nhận <span class="tab-count" th:text="${countCho}">0</span>
+        </a>
+        <a th:href="@{/admin/orders(status='DA_XAC_NHAN')}" class="filter-tab"
+           th:classappend="${currentStatus == 'DA_XAC_NHAN'} ? 'active' : ''">
+            ✅ Đã xác nhận <span class="tab-count" th:text="${countXacNhan}">0</span>
+        </a>
+        <a th:href="@{/admin/orders(status='DANG_GIAO')}" class="filter-tab"
+           th:classappend="${currentStatus == 'DANG_GIAO'} ? 'active' : ''">
+            🚚 Đang giao <span class="tab-count" th:text="${countDangGiao}">0</span>
+        </a>
+        <a th:href="@{/admin/orders(status='DA_GIAO')}" class="filter-tab"
+           th:classappend="${currentStatus == 'DA_GIAO'} ? 'active' : ''">
+            📦 Đã giao <span class="tab-count" th:text="${countDaGiao}">0</span>
+        </a>
+        <a th:href="@{/admin/orders(status='DA_HUY')}" class="filter-tab"
+           th:classappend="${currentStatus == 'DA_HUY'} ? 'active' : ''">
+            ❌ Đã hủy <span class="tab-count" th:text="${countHuy}">0</span>
+        </a>
+    </div>
 
-                <div th:unless="${orders.empty}" class="table-responsive">
-                    <table class="orders-table">
-                        <thead>
-                            <tr>
-                                <th>Mã đơn</th>
-                                <th>Khách hàng</th>
-                                <th>Ngày đặt</th>
-                                <th>Tổng tiền</th>
-                                <th>Vận chuyển</th>
-                                <th>Trạng thái</th>
-                                <th>Cập nhật</th>
-                                <th>Thao tác</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:each="order : ${orders.content}">
-                                <td>
-                                    <span class="order-id">#GS-<span th:text="${order.id}">0</span></span>
-                                </td>
-                                <td>
-                                    <div class="customer-name" th:text="${order.nguoiDung.ten}">—</div>
-                                    <div class="customer-email" th:text="${order.nguoiDung.email}">—</div>
-                                </td>
-                                <td>
-                                    <span th:text="${#temporals.format(order.ngayDat, 'dd/MM/yyyy')}">—</span>
-                                </td>
-                                <td>
-                                    <span class="fw-bold text-danger"
-                                          th:text="${#numbers.formatInteger(order.tongTien, 0, 'COMMA') + '₫'}">0₫</span>
-                                </td>
-                                <td>
-                                    <span class="badge bg-secondary bg-opacity-10 text-dark"
-                                          th:text="${order.donViVanChuyen ?: 'GHN'}">GHN</span>
-                                </td>
-                                <td>
-                                    <span class="status-badge"
-                                          th:classappend="${'status-' + order.tinhTrang}"
-                                          th:text="${order.tinhTrangLabel}">—</span>
-                                </td>
-                                <td>
-                                    <select class="status-select"
-                                            th:attr="onchange=${'updateStatus(' + order.id + ', this.value)'}"
-                                            th:disabled="${order.tinhTrang == 'DA_GIAO' or order.tinhTrang == 'DA_HUY'}">
-                                        <option value="CHO_XAC_NHAN" th:selected="${order.tinhTrang == 'CHO_XAC_NHAN'}">Chờ xác nhận</option>
-                                        <option value="DA_XAC_NHAN"  th:selected="${order.tinhTrang == 'DA_XAC_NHAN'}">Đã xác nhận</option>
-                                        <option value="DANG_GIAO"    th:selected="${order.tinhTrang == 'DANG_GIAO'}">Đang giao</option>
-                                        <option value="DA_GIAO"      th:selected="${order.tinhTrang == 'DA_GIAO'}">Đã giao</option>
-                                        <option value="DA_HUY"       th:selected="${order.tinhTrang == 'DA_HUY'}">Đã hủy</option>
+    <!-- Table -->
+    <div class="admin-card">
+        <div th:if="${orders != null and orders.totalElements > 0}">
+            <div style="overflow-x:auto;">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Mã đơn</th>
+                            <th>Khách hàng</th>
+                            <th>Sản phẩm</th>
+                            <th>Tổng tiền</th>
+                            <th>Ngày đặt</th>
+                            <th>Trạng thái</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="order-row" th:each="order : ${orders.content}">
+                            <td>#GS-<span th:text="${order.id}">0</span></td>
+                            <td>
+                                <div style="font-weight:600;font-size:0.875rem;" th:text="${order.nguoiDung?.ten ?: 'N/A'}">Tên</div>
+                                <div style="font-size:0.75rem;color:#888;" th:text="${order.nguoiDung?.email ?: ''}">email</div>
+                            </td>
+                            <td>
+                                <span class="status-badge secondary" th:text="${(order.chiTietDonHangs?.size() ?: 0) + ' sản phẩm'}">0 sp</span>
+                            </td>
+                            <td>
+                                <span style="font-weight:700;color:#dc3545;">
+                                    [[${#numbers.formatInteger(order.tongTien, 0, 'COMMA')}]]₫
+                                </span>
+                            </td>
+                            <td style="color:#888;font-size:0.82rem;" th:text="${order.ngayDat}">--</td>
+                            <td>
+                                <span class="status-badge"
+                                      th:classappend="${order.tinhTrangBadge}"
+                                      th:text="${order.tinhTrangLabel}">--</span>
+                            </td>
+                            <td>
+                                <div style="display:flex;gap:8px;align-items:center;">
+                                    <!-- Dropdown đổi trạng thái -->
+                                    <select class="select-status"
+                                            th:attr="onchange='updateStatus(' + ${order.id} + ', this.value)'"
+                                            th:if="${order.tinhTrang != 'DA_GIAO' and order.tinhTrang != 'DA_HUY'}">
+                                        <option value="CHO_XAC_NHAN" th:selected="${order.tinhTrang == 'CHO_XAC_NHAN'}">⏳ Chờ xác nhận</option>
+                                        <option value="DA_XAC_NHAN"  th:selected="${order.tinhTrang == 'DA_XAC_NHAN'}">✅ Đã xác nhận</option>
+                                        <option value="DANG_GIAO"    th:selected="${order.tinhTrang == 'DANG_GIAO'}">🚚 Đang giao</option>
+                                        <option value="DA_GIAO"      th:selected="${order.tinhTrang == 'DA_GIAO'}">📦 Đã giao</option>
+                                        <option value="DA_HUY"       th:selected="${order.tinhTrang == 'DA_HUY'}">❌ Hủy</option>
                                     </select>
-                                </td>
-                                <td>
-                                    <a th:href="@{'/admin/orders/' + ${order.id}}" class="btn-view">
-                                        <i class="bi bi-eye me-1"></i>Chi tiết
+                                    <a th:href="@{'/admin/orders/' + ${order.id}}" class="btn-admin-outline" style="padding:6px 12px;font-size:0.78rem;">
+                                        <i class="bi bi-eye"></i>
                                     </a>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="d-flex justify-content-center py-4" th:if="${totalPages > 1}">
+                <nav>
+                    <ul class="pagination pagination-sm">
+                        <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                            <a class="page-link" th:href="@{/admin/orders(page=${currentPage-1},status=${currentStatus})}">‹</a>
+                        </li>
+                        <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages-1)}"
+                            th:classappend="${currentPage == i} ? 'active'">
+                            <a class="page-link" th:href="@{/admin/orders(page=${i},status=${currentStatus})}" th:text="${i+1}">1</a>
+                        </li>
+                        <li class="page-item" th:classappend="${currentPage == totalPages-1} ? 'disabled'">
+                            <a class="page-link" th:href="@{/admin/orders(page=${currentPage+1},status=${currentStatus})}">›</a>
+                        </li>
+                    </ul>
+                </nav>
             </div>
         </div>
 
-        <!-- PAGINATION -->
-        <div class="d-flex justify-content-center mt-4" th:if="${totalPages > 1}">
-            <nav>
-                <ul class="pagination">
-                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                        <a class="page-link text-danger"
-                           th:href="@{/admin/orders(page=${currentPage - 1}, status=${currentStatus})}">
-                            <i class="bi bi-chevron-left"></i>
-                        </a>
-                    </li>
-                    <li class="page-item"
-                        th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
-                        th:classappend="${currentPage == i} ? 'active'">
-                        <a class="page-link"
-                           th:classappend="${currentPage == i} ? 'bg-danger border-danger'"
-                           th:href="@{/admin/orders(page=${i}, status=${currentStatus})}"
-                           th:text="${i + 1}">1</a>
-                    </li>
-                    <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
-                        <a class="page-link text-danger"
-                           th:href="@{/admin/orders(page=${currentPage + 1}, status=${currentStatus})}">
-                            <i class="bi bi-chevron-right"></i>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
+        <!-- Empty -->
+        <div class="empty-state" th:if="${orders == null or orders.totalElements == 0}">
+            <i class="bi bi-inbox"></i>
+            <h5>Không có đơn hàng nào</h5>
+            <p class="text-muted small">Chưa có đơn hàng trong trạng thái này</p>
         </div>
-
-    </div><!-- end container -->
-
-    <!-- TOAST -->
-    <div id="adminToast" class="ok">
-        <i class="bi bi-check-circle-fill fs-5"></i>
-        <span id="adminToastTxt">OK</span>
     </div>
 
 </th:block>
-<th:block layout:fragment="scripts">
-<script>
+
+<th:block layout:fragment="admin-scripts">
+<script th:inline="javascript">
     const CSRF_TOKEN  = document.querySelector('meta[name="_csrf"]')?.content ?? '';
     const CSRF_HEADER = document.querySelector('meta[name="_csrf_header"]')?.content ?? 'X-CSRF-TOKEN';
+
+    function showToast(msg, type = 'ok') {
+        const t = document.getElementById('adminToast');
+        document.getElementById('toastMsg').textContent = msg;
+        t.className = type;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 3000);
+    }
 
     function updateStatus(orderId, newStatus) {
         fetch(`/admin/orders/${orderId}/status`, {
@@ -344,32 +248,15 @@
             body: `status=${encodeURIComponent(newStatus)}`
         })
         .then(r => r.json())
-        .then(d => {
-            if (d.success) {
-                showToast('✓ ' + d.message, 'ok');
-                // Cập nhật badge trên row
-                const row = event.target.closest('tr');
-                const badge = row?.querySelector('.status-badge');
-                if (badge) {
-                    badge.textContent = d.newStatus;
-                    badge.className = 'status-badge status-' + newStatus;
-                }
+        .then(data => {
+            if (data.success) {
+                showToast('✅ Cập nhật trạng thái thành công!', 'ok');
+                setTimeout(() => location.reload(), 1200);
             } else {
-                showToast(d.message, 'err');
+                showToast('❌ ' + (data.message || 'Lỗi cập nhật'), 'err');
             }
         })
-        .catch(() => showToast('Lỗi kết nối server', 'err'));
-    }
-
-    let _tt;
-    function showToast(msg, type = 'ok') {
-        const el = document.getElementById('adminToast');
-        const tx = document.getElementById('adminToastTxt');
-        el.className = type;
-        tx.textContent = msg;
-        el.classList.add('show');
-        clearTimeout(_tt);
-        _tt = setTimeout(() => el.classList.remove('show'), 2800);
+        .catch(() => showToast('❌ Lỗi kết nối!', 'err'));
     }
 </script>
 </th:block>

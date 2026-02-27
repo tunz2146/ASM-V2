@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Lỗi - Gaming Shop</title>
+    <th:block layout:fragment="styles">
+    <style>
+        .error-page {
+            min-height: 70vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #0f0c29, #1a1a2e);
+            padding: 60px 20px;
+        }
+        .error-box {
+            text-align: center;
+            color: #fff;
+            max-width: 520px;
+        }
+        .error-code {
+            font-size: 7rem;
+            font-weight: 900;
+            line-height: 1;
+            background: linear-gradient(135deg, #dc3545, #e83e8c, #6366f1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+        .error-icon {
+            font-size: 3rem;
+            color: #dc3545;
+            margin-bottom: 16px;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        .error-title { font-size: 1.6rem; font-weight: 700; margin-bottom: 12px; }
+        .error-desc { color: rgba(255,255,255,0.6); font-size: 0.95rem; margin-bottom: 32px; line-height: 1.7; }
+        .error-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+        .btn-home {
+            background: linear-gradient(135deg, #dc3545, #e83e8c);
+            color: #fff;
+            border: none;
+            padding: 13px 28px;
+            border-radius: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+        .btn-home:hover { opacity: 0.85; color: #fff; }
+        .btn-back {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            border: 1.5px solid rgba(255,255,255,0.2);
+            padding: 13px 28px;
+            border-radius: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .btn-back:hover { background: rgba(255,255,255,0.2); color: #fff; }
+        .error-debug {
+            margin-top: 30px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 16px;
+            font-size: 0.82rem;
+            color: rgba(255,255,255,0.5);
+            text-align: left;
+        }
+        .error-debug strong { color: rgba(255,255,255,0.8); }
+    </style>
+    </th:block>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="error-page">
+        <div class="error-box">
+            <div class="error-icon">
+                <!-- 404 -->
+                <i th:if="${status == 404}" class="bi bi-search"></i>
+                <!-- 403 -->
+                <i th:if="${status == 403}" class="bi bi-shield-exclamation"></i>
+                <!-- 500 hoặc khác -->
+                <i th:if="${status != 404 and status != 403}" class="bi bi-exclamation-triangle"></i>
+            </div>
+
+            <div class="error-code" th:text="${status ?: '???'}">404</div>
+
+            <h2 class="error-title">
+                <span th:if="${status == 404}">Không tìm thấy trang</span>
+                <span th:if="${status == 403}">Không có quyền truy cập</span>
+                <span th:if="${status == 500}">Lỗi máy chủ</span>
+                <span th:if="${status != 404 and status != 403 and status != 500}">Đã xảy ra lỗi</span>
+            </h2>
+
+            <p class="error-desc">
+                <span th:if="${status == 404}">
+                    Trang bạn đang tìm kiếm không tồn tại hoặc đã bị di chuyển.<br/>
+                    Hãy kiểm tra lại đường dẫn hoặc quay về trang chủ.
+                </span>
+                <span th:if="${status == 403}">
+                    Bạn không có quyền truy cập vào trang này.<br/>
+                    Vui lòng đăng nhập hoặc liên hệ quản trị viên.
+                </span>
+                <span th:if="${status == 500}">
+                    Máy chủ gặp sự cố. Đội ngũ kỹ thuật đã được thông báo.<br/>
+                    Vui lòng thử lại sau vài phút.
+                </span>
+                <span th:if="${status != 404 and status != 403 and status != 500}">
+                    Đã xảy ra lỗi không mong muốn. Vui lòng thử lại.
+                </span>
+            </p>
+
+            <div class="error-actions">
+                <a href="/" class="btn-home">
+                    <i class="bi bi-house-fill me-2"></i>Trang chủ
+                </a>
+                <a href="javascript:history.back()" class="btn-back">
+                    <i class="bi bi-arrow-left me-2"></i>Quay lại
+                </a>
+                <a href="/products" class="btn-back">
+                    <i class="bi bi-shop me-2"></i>Xem sản phẩm
+                </a>
+            </div>
+
+            <!-- Debug info (chỉ hiện khi có error message) -->
+            <div class="error-debug" th:if="${message != null and message != ''}">
+                <strong>Chi tiết lỗi:</strong><br/>
+                <span th:text="${message}">Error message</span>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

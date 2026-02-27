@@ -320,11 +320,13 @@
                             <div class="col-md-6">
                                 <label class="form-label">Họ và tên <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="fullName"
-                                       placeholder="Nguyễn Văn A" required/>
+                                        th:value="${prefillName}"
+                                        placeholder="Nguyễn Văn A" required/>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Số điện thoại <span class="text-danger">*</span></label>
                                 <input type="tel" class="form-control" id="phone"
+                                        th:value="${prefillPhone}"
                                        placeholder="0794 612 606" required/>
                             </div>
                             <div class="col-12">
@@ -336,6 +338,7 @@
                             <div class="col-12">
                                 <label class="form-label">Địa chỉ cụ thể <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="address"
+                                        th:value="${prefillAddress}"
                                        placeholder="Số nhà, tên đường, phường/xã" required/>
                             </div>
                             <div class="col-md-4">
@@ -358,7 +361,8 @@
                             </div>
                             <div class="col-12">
                                 <label class="form-label">Ghi chú đơn hàng</label>
-                                <textarea class="form-control" id="note" rows="2"
+                                    <textarea class="form-control" id="note" rows="2"
+                                                th:text="${prefillNote}"></textarea>
                                           placeholder="Giao giờ hành chính, gọi trước khi đến..."></textarea>
                             </div>
                         </div>
@@ -573,44 +577,112 @@
 
 <th:block layout:fragment="scripts">
 <script th:inline="javascript">
-    const TOTAL_AMOUNT = /*[[${totalAmount != null ? totalAmount + (totalAmount >= 1000000 ? 0 : 30000) : 0}]]*/ 0;
-    const CSRF_TOKEN  = document.querySelector('meta[name="_csrf"]')?.content  ?? '';
-    const CSRF_HEADER = document.querySelector('meta[name="_csrf_header"]')?.content ?? 'X-CSRF-TOKEN';
+    const TOTAL_AMOUNT = /*[[${totalAmount}]]*/ 0;
+    const CSRF_TOKEN   = document.querySelector('meta[name="_csrf"]')?.content  ?? '';
+    const CSRF_HEADER  = document.querySelector('meta[name="_csrf_header"]')?.content ?? 'X-CSRF-TOKEN';
 
     function vnd(n) { return new Intl.NumberFormat('vi-VN').format(n) + '₫'; }
 
     let countdownInterval;
+    let _savedOrderData = null; // Lưu kết quả từ server
 
-    /* ===== ĐẶT HÀNG → Hiện QR ===== */
-    function placeOrder() {
+    /* ========================================================
+       VALIDATE + GỌI API LƯU ĐƠN HÀNG → SAU ĐÓ HIỆN QR
+       ======================================================== */
+    async function placeOrder() {
+        // 1. Lấy giá trị form
         const fullName = document.getElementById('fullName').value.trim();
         const phone    = document.getElementById('phone').value.trim();
         const address  = document.getElementById('address').value.trim();
+        const city     = document.getElementById('city')?.value.trim()     ?? '';
+        const district = document.getElementById('district')?.value.trim() ?? '';
+        const ward     = document.getElementById('ward')?.value.trim()     ?? '';
+        const note     = document.getElementById('note')?.value.trim()     ?? '';
 
-        if (!fullName || !phone || !address) {
-            alert('Vui lòng điền đầy đủ thông tin: Họ tên, Số điện thoại, Địa chỉ!');
-            return;
+        // 2. Validate phía client
+        clearErrors();
+
+        let hasError = false;
+
+        if (!fullName) {
+            showFieldError('fullName', 'Vui lòng nhập họ và tên');
+            hasError = true;
+        } else if (fullName.length < 2) {
+            showFieldError('fullName', 'Họ tên phải có ít nhất 2 ký tự');
+            hasError = true;
         }
 
-        // Tạo mã đơn hàng ngẫu nhiên
-        const orderCode = 'GS-' + Date.now().toString().slice(-6);
+        if (!phone) {
+            showFieldError('phone', 'Vui lòng nhập số điện thoại');
+            hasError = true;
+        } else if (!/^(0|\+84)[0-9]{8,10}$/.test(phone)) {
+            showFieldError('phone', 'Số điện thoại không hợp lệ (VD: 0794612606)');
+            hasError = true;
+        }
 
-        // Cập nhật nội dung QR modal
-        document.getElementById('qrAmountDisplay').textContent = vnd(TOTAL_AMOUNT);
-        document.getElementById('qrTransferNote').textContent  = orderCode;
+        if (!address) {
+            showFieldError('address', 'Vui lòng nhập địa chỉ cụ thể (số nhà, tên đường...)');
+            hasError = true;
+        } else if (address.length < 5) {
+            showFieldError('address', 'Địa chỉ quá ngắn, vui lòng nhập đầy đủ hơn');
+            hasError = true;
+        }
 
-        // Hiện modal QR
-        document.getElementById('qrOverlay').classList.add('show');
+        if (hasError) return;
 
-        // Bắt đầu đếm ngược 15 phút
-        startCountdown(15 * 60);
+        // 3. Disable nút, hiện loading
+        const btn = document.querySelector('.btn-place-order');
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Đang xử lý...';
+        }
 
-        // Lưu để dùng ở confirm
-        window._orderCode  = orderCode;
-        window._orderTotal = vnd(TOTAL_AMOUNT);
+        try {
+            // 4. Gọi API lưu đơn hàng vào DB
+            const res = await fetch('/checkout/place-order', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    [CSRF_HEADER]: CSRF_TOKEN
+                },
+                body: JSON.stringify({ fullName, phone, address, city, district, ward, note })
+            });
+
+            const data = await res.json();
+
+            if (!data.success) {
+                // Hiện lỗi từ server
+                showGlobalError(data.message || 'Có lỗi xảy ra, vui lòng thử lại!');
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="bi bi-qr-code me-2"></i>Đặt hàng &amp; Hiển thị mã QR';
+                }
+                return;
+            }
+
+            // 5. Lưu kết quả để dùng khi confirm
+            _savedOrderData = data;
+
+            // 6. Cập nhật QR modal với thông tin thật
+            document.getElementById('qrAmountDisplay').textContent = vnd(data.total);
+            document.getElementById('qrTransferNote').textContent  = data.orderCode;
+
+            // 7. Hiện QR overlay
+            document.getElementById('qrOverlay').classList.add('show');
+            startCountdown(15 * 60);
+
+        } catch (err) {
+            showGlobalError('Lỗi kết nối, vui lòng thử lại!');
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-qr-code me-2"></i>Đặt hàng &amp; Hiển thị mã QR';
+            }
+        }
     }
 
-    /* ===== ĐẾM NGƯỢC QR ===== */
+    /* ========================================================
+       ĐẾM NGƯỢC QR
+       ======================================================== */
     function startCountdown(seconds) {
         clearInterval(countdownInterval);
         const el = document.getElementById('qrCountdown');
@@ -625,38 +697,92 @@
             if (remaining <= 0) {
                 clearInterval(countdownInterval);
                 el.textContent = 'Hết hạn';
-                alert('Mã QR đã hết hạn. Vui lòng đặt lại đơn hàng!');
+                alert('Mã QR đã hết hạn. Đơn hàng của bạn đã được lưu, vui lòng liên hệ shop để xác nhận thanh toán!');
                 closeQR();
+                showSuccessWithData(); // Vẫn hiện thành công vì đơn đã lưu rồi
             }
         }, 1000);
     }
 
-    /* ===== ĐÓNG QR ===== */
+    /* ========================================================
+       ĐÓNG QR
+       ======================================================== */
     function closeQR() {
         clearInterval(countdownInterval);
         document.getElementById('qrOverlay').classList.remove('show');
     }
 
-    /* ===== XÁC NHẬN ĐÃ CHUYỂN KHOẢN ===== */
+    /* ========================================================
+       XÁC NHẬN ĐÃ CHUYỂN KHOẢN
+       ======================================================== */
     function confirmPaid() {
         clearInterval(countdownInterval);
         document.getElementById('qrOverlay').classList.remove('show');
-
-        // Hiện màn hình thành công
-        document.getElementById('orderCode').textContent  = window._orderCode;
-        document.getElementById('orderTotal').textContent = window._orderTotal;
-        document.getElementById('successOverlay').classList.add('show');
-
-        // Xóa giỏ hàng
-        fetch('/cart/clear', {
-            method: 'POST',
-            headers: { [CSRF_HEADER]: CSRF_TOKEN }
-        }).catch(() => {});
+        showSuccessWithData();
     }
 
-    /* ===== CLICK NGOÀI MODAL ĐỂ ĐÓNG ===== */
-    document.getElementById('qrOverlay').addEventListener('click', function(e) {
-        if (e.target === this) closeQR();
+    function showSuccessWithData() {
+        if (_savedOrderData) {
+            document.getElementById('orderCode').textContent  = _savedOrderData.orderCode;
+            document.getElementById('orderTotal').textContent = vnd(_savedOrderData.total);
+        }
+        document.getElementById('successOverlay').classList.add('show');
+        // Giỏ hàng đã được xóa bởi server khi tạo đơn, không cần gọi /cart/clear nữa
+    }
+
+    /* ========================================================
+       HIỆN LỖI TỪNG FIELD
+       ======================================================== */
+    function showFieldError(fieldId, message) {
+        const field = document.getElementById(fieldId);
+        if (!field) return;
+        field.classList.add('is-invalid');
+        // Tìm hoặc tạo div lỗi
+        let errDiv = field.parentNode.querySelector('.invalid-feedback');
+        if (!errDiv) {
+            errDiv = document.createElement('div');
+            errDiv.className = 'invalid-feedback';
+            field.parentNode.appendChild(errDiv);
+        }
+        errDiv.textContent = message;
+    }
+
+    function showGlobalError(message) {
+        let errEl = document.getElementById('globalError');
+        if (!errEl) {
+            errEl = document.createElement('div');
+            errEl.id = 'globalError';
+            errEl.className = 'alert alert-danger mt-3 rounded-3';
+            const btn = document.querySelector('.btn-place-order');
+            btn?.parentNode.insertBefore(errEl, btn);
+        }
+        errEl.innerHTML = `<i class="bi bi-exclamation-triangle-fill me-2"></i>${message}`;
+        errEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function clearErrors() {
+        document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+        document.getElementById('globalError')?.remove();
+    }
+
+    // Xóa lỗi khi user gõ lại
+    ['fullName','phone','address'].forEach(id => {
+        document.getElementById(id)?.addEventListener('input', () => {
+            const el = document.getElementById(id);
+            el?.classList.remove('is-invalid');
+        });
+    });
+
+    /* ========================================================
+       CLICK NGOÀI MODAL ĐỂ ĐÓNG
+       ======================================================== */
+    document.getElementById('qrOverlay')?.addEventListener('click', function(e) {
+        if (e.target === this) {
+            if (confirm('Bạn có chắc muốn đóng? Đơn hàng đã được lưu, bạn có thể xem lại trong "Đơn hàng của tôi".')) {
+                closeQR();
+                showSuccessWithData();
+            }
+        }
     });
 </script>
 </th:block>

@@ -19,4 +19,12 @@ public class Hang {
 
     @OneToMany(mappedBy = "hang")
     private List<SanPham> sanPhams;
+
+    public void setTenHang(String tenHang) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public Object getSanPhams() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }

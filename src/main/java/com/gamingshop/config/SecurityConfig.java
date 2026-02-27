@@ -6,8 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-// import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder; // ❌ Bỏ dòng này
-import org.springframework.security.crypto.password.NoOpPasswordEncoder; // ✅ Thêm dòng này
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -17,14 +16,11 @@ public class SecurityConfig {
     @Autowired
     private CustomUserDetailsService userDetailsService;
 
-    // 👇 SỬA LẠI ĐOẠN NÀY ĐỂ DÙNG PASSWORD THƯỜNG
     @Bean
     public PasswordEncoder passwordEncoder() {
-        // Trả về NoOpPasswordEncoder (Deprecated nhưng dùng được cho test/học tập)
         return NoOpPasswordEncoder.getInstance();
     }
-    
-    // ... Các phần bean authenticationProvider và filterChain giữ nguyên như cũ ...
+
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider auth = new DaoAuthenticationProvider();
@@ -35,40 +31,57 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        // ... (Giữ nguyên code phần authorizeHttpRequests cũ) ...
         http
             .authorizeHttpRequests(auth -> auth
-            .requestMatchers(
-                "/", "/home",
-                "/products/**",
-                "/css/**", "/js/**", "/images/**",
-                "/register", "/do-register", "/login",
+                .requestMatchers(
+                    // Trang chủ & sản phẩm
+                    "/", "/home",
+                    "/products/**",
 
-                // Các trang public thêm vào
-                "/deals", "/about", "/contact",
-                "/shipping", "/warranty", "/return",
-                "/privacy", "/terms"
-            ).permitAll()
+                    // Thông tin & chính sách
+                    "/deals", "/about", "/contact",
+                    "/shipping", "/warranty", "/return",
+                    "/privacy", "/terms",
 
-            .requestMatchers("/admin/**").hasRole("ADMIN")
-            .requestMatchers("/cart/**").authenticated()
-            
-            .anyRequest().authenticated()
-        )
+                    // Auth
+                    "/login", "/register", "/do-register",
+
+                    //  Quên mật khẩu
+                    "/forgot-password",
+
+                    //  Đăng ký newsletter
+                    "/newsletter/subscribe",
+
+                    // Static resources
+                    "/css/**", "/js/**", "/images/**",
+                    "/webjars/**", "/favicon.ico"
+                ).permitAll()
+
+                // Chỉ ADMIN mới vào được /admin/**
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+
+                // Các trang còn lại cần đăng nhập
+                .anyRequest().authenticated()
+            )
+
+            // Cấu hình form login
             .formLogin(form -> form
-            .loginPage("/login")
-            .loginProcessingUrl("/do-login")
-            .defaultSuccessUrl("/", true)
-            .failureUrl("/login?error=true")
-            .permitAll()
-        )
+                .loginPage("/login")
+                .loginProcessingUrl("/do-login")
+                .defaultSuccessUrl("/", true)
+                .failureUrl("/login?error=true")
+                .permitAll()
+            )
 
-        .logout(logout -> logout
-            .logoutUrl("/logout")
-            .logoutSuccessUrl("/")
-            .permitAll()
-        );
-        
+            // Cấu hình logout
+            .logout(logout -> logout
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/")
+                .invalidateHttpSession(true)
+                .deleteCookies("JSESSIONID")
+                .permitAll()
+            );
+
         return http.build();
     }
 }

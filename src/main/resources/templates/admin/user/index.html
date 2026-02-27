@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/admin-base}">
+<head>
+    <title>Quản lý khách hàng</title>
+    <th:block layout:fragment="css">
+    <style>
+        .stat-card {
+            border-radius: 14px; border: none;
+            padding: 18px 20px;
+            display: flex; align-items: center; gap: 14px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            transition: transform 0.2s;
+        }
+        .stat-card:hover { transform: translateY(-2px); }
+        .stat-icon {
+            width: 48px; height: 48px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem; flex-shrink: 0;
+        }
+        .stat-num { font-size: 1.6rem; font-weight: 800; line-height: 1; }
+        .stat-lbl { font-size: 0.78rem; color: #888; margin-top: 3px; }
+
+        .filter-bar {
+            background: #fff; border-radius: 14px;
+            padding: 16px 20px; margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+        }
+        .search-input {
+            flex: 1; min-width: 220px;
+            border: 1.5px solid #e8eaf0; border-radius: 10px;
+            padding: 9px 14px 9px 38px;
+            font-size: 0.88rem; outline: none;
+            transition: border-color 0.2s;
+            background: #f8f9fc url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%23aaa' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.099zm-5.44 1.406a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z'/%3E%3C/svg%3E") no-repeat 12px center;
+        }
+        .search-input:focus { border-color: #dc3545; }
+
+        .role-tabs { display: flex; gap: 6px; }
+        .role-tab {
+            padding: 8px 16px; border-radius: 8px; font-size: 0.82rem;
+            font-weight: 600; text-decoration: none; border: 1.5px solid #e8eaf0;
+            color: #666; background: #fff; transition: all 0.2s; white-space: nowrap;
+        }
+        .role-tab.active, .role-tab:hover {
+            background: #dc3545; border-color: #dc3545; color: #fff;
+        }
+        .role-tab.admin-tab.active { background: #1a1a2e; border-color: #1a1a2e; }
+
+        .user-table { background: #fff; border-radius: 14px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .user-table table { margin: 0; }
+        .user-table thead th {
+            background: #f8f9fc; font-size: 0.78rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.5px; color: #888;
+            border-bottom: 1px solid #f0f0f0; padding: 13px 16px;
+        }
+        .user-table tbody td { padding: 14px 16px; vertical-align: middle; font-size: 0.88rem; border-bottom: 1px solid #f8f9fc; }
+        .user-table tbody tr:last-child td { border-bottom: none; }
+        .user-table tbody tr:hover { background: #fafbfc; }
+
+        .avatar-mini {
+            width: 38px; height: 38px; border-radius: 50%;
+            display: inline-flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 0.9rem; color: #fff; flex-shrink: 0;
+        }
+        .user-name { font-weight: 600; color: #1a1a2e; }
+        .user-email { font-size: 0.78rem; color: #aaa; }
+
+        .badge-role {
+            padding: 4px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 700;
+        }
+        .badge-admin { background: #fff0f0; color: #dc3545; }
+        .badge-user  { background: #f0fdf4; color: #16a34a; }
+
+        .action-btn {
+            width: 32px; height: 32px; border-radius: 8px; border: none;
+            display: inline-flex; align-items: center; justify-content: center;
+            font-size: 0.85rem; cursor: pointer; transition: all 0.15s;
+        }
+        .btn-detail  { background: #e8f4fd; color: #1d6fa4; }
+        .btn-role    { background: #fff8e1; color: #e65100; }
+        .btn-reset   { background: #f3e8ff; color: #7e22ce; }
+        .btn-delete  { background: #fce8e8; color: #dc3545; }
+        .action-btn:hover { filter: brightness(0.9); transform: scale(1.1); }
+
+        /* Toast */
+        #adminToast {
+            position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+            background: #1a1a2e; color: #fff; padding: 14px 20px;
+            border-radius: 12px; font-size: 0.85rem; font-weight: 500;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            display: none; align-items: center; gap: 10px;
+            border-left: 4px solid #22c55e; min-width: 260px;
+        }
+        #adminToast.error { border-left-color: #dc3545; }
+
+        /* Modal confirm */
+        .confirm-modal-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.5); z-index: 1050;
+            align-items: center; justify-content: center;
+        }
+        .confirm-modal-overlay.show { display: flex; }
+        .confirm-modal {
+            background: #fff; border-radius: 16px; padding: 28px;
+            width: 100%; max-width: 380px; box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        }
+        .confirm-modal h6 { font-weight: 800; color: #1a1a2e; margin-bottom: 8px; }
+        .confirm-modal p  { color: #888; font-size: 0.88rem; }
+    </style>
+    </th:block>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <!-- Breadcrumb -->
+    <div class="d-flex align-items-center gap-2 mb-4">
+        <a href="/admin/dashboard" class="text-muted text-decoration-none small">Dashboard</a>
+        <i class="bi bi-chevron-right text-muted" style="font-size:0.7rem;"></i>
+        <span class="small fw-semibold">Khách hàng</span>
+    </div>
+
+    <!-- Stat cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-sm-4">
+            <div class="stat-card" style="background:#fff5f5;">
+                <div class="stat-icon" style="background:#fce8e8;"><i class="bi bi-people-fill" style="color:#dc3545;"></i></div>
+                <div>
+                    <div class="stat-num" style="color:#dc3545;" th:text="${totalAll}">0</div>
+                    <div class="stat-lbl">Tổng tài khoản</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="stat-card" style="background:#f0fdf4;">
+                <div class="stat-icon" style="background:#dcfce7;"><i class="bi bi-person-check-fill" style="color:#16a34a;"></i></div>
+                <div>
+                    <div class="stat-num" style="color:#16a34a;" th:text="${totalUser}">0</div>
+                    <div class="stat-lbl">Khách hàng (USER)</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="stat-card" style="background:#fafafa;">
+                <div class="stat-icon" style="background:#f0f0f0;"><i class="bi bi-shield-fill-check" style="color:#1a1a2e;"></i></div>
+                <div>
+                    <div class="stat-num" style="color:#1a1a2e;" th:text="${totalAdmin}">0</div>
+                    <div class="stat-lbl">Quản trị viên (ADMIN)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter bar -->
+    <div class="filter-bar">
+        <!-- Search form -->
+        <form method="get" action="/admin/users" style="display:contents;">
+            <input type="text" name="keyword" class="search-input"
+                   placeholder="Tìm theo tên, email, SĐT..."
+                   th:value="${keyword}"/>
+
+            <!-- Role tabs -->
+            <div class="role-tabs">
+                <a href="/admin/users"
+                   th:classappend="${currentRole == null} ? 'active'"
+                   class="role-tab">Tất cả</a>
+                <a th:href="@{/admin/users(role='USER')}"
+                   th:classappend="${currentRole == 'USER'} ? 'active'"
+                   class="role-tab">👤 Khách hàng</a>
+                <a th:href="@{/admin/users(role='ADMIN')}"
+                   th:classappend="${currentRole == 'ADMIN'} ? 'active admin-tab'"
+                   class="role-tab admin-tab">🛡️ Admin</a>
+            </div>
+
+            <button type="submit" class="btn btn-danger btn-sm px-3 rounded-3">
+                <i class="bi bi-search me-1"></i>Tìm
+            </button>
+            <a href="/admin/users" class="btn btn-outline-secondary btn-sm px-3 rounded-3">
+                <i class="bi bi-arrow-counterclockwise"></i>
+            </a>
+        </form>
+    </div>
+
+    <!-- Table -->
+    <div class="user-table">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Khách hàng</th>
+                    <th>Số điện thoại</th>
+                    <th>Giới tính</th>
+                    <th>Ngày sinh</th>
+                    <th>Role</th>
+                    <th style="text-align:center;">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:if="${users.isEmpty()}">
+                    <td colspan="7" style="text-align:center; padding: 40px; color:#aaa;">
+                        <i class="bi bi-people" style="font-size:2.5rem; display:block; margin-bottom:10px;"></i>
+                        Không có khách hàng nào
+                    </td>
+                </tr>
+                <tr th:each="u, stat : ${users}">
+                    <td style="color:#aaa; font-size:0.78rem;"
+                        th:text="${users.number * users.size + stat.index + 1}">1</td>
+
+                    <!-- Avatar + Tên + Email -->
+                    <td>
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="avatar-mini"
+                                 th:style="${u.role == 'ADMIN'}
+                                           ? 'background:linear-gradient(135deg,#1a1a2e,#dc3545);'
+                                           : 'background:linear-gradient(135deg,#3b82f6,#6366f1);'"
+                                 th:text="${u.ten != null and !u.ten.isEmpty()}
+                                           ? ${#strings.toUpperCase(#strings.substring(u.ten,0,1))}
+                                           : ${#strings.toUpperCase(#strings.substring(u.email,0,1))}">A</div>
+                            <div>
+                                <div class="user-name"
+                                     th:text="${u.ten != null and !u.ten.isEmpty()} ? ${u.ten} : 'Chưa cập nhật'">Tên</div>
+                                <div class="user-email" th:text="${u.email}">email</div>
+                            </div>
+                        </div>
+                    </td>
+
+                    <td th:text="${u.soDienThoai != null} ? ${u.soDienThoai} : '—'">—</td>
+
+                    <td>
+                        <span th:if="${u.gioiTinh == true}">👨 Nam</span>
+                        <span th:if="${u.gioiTinh == false}">👩 Nữ</span>
+                        <span th:if="${u.gioiTinh == null}" style="color:#ccc;">—</span>
+                    </td>
+
+                    <td th:text="${u.ngaySinh != null} ? ${#dates.format(u.ngaySinh,'dd/MM/yyyy')} : '—'">—</td>
+
+                    <!-- Role badge + dropdown đổi role -->
+                    <td>
+                        <span th:if="${u.role == 'ADMIN'}" class="badge-role badge-admin">🛡️ ADMIN</span>
+                        <span th:unless="${u.role == 'ADMIN'}" class="badge-role badge-user">👤 USER</span>
+                    </td>
+
+                    <!-- Thao tác -->
+                    <td style="text-align:center;">
+                        <div class="d-flex gap-1 justify-content-center">
+                            <!-- Chi tiết -->
+                            <a th:href="@{/admin/users/{id}(id=${u.id})}"
+                               class="action-btn btn-detail" title="Xem chi tiết">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            <!-- Đổi role -->
+                            <button class="action-btn btn-role" title="Đổi role"
+                                    th:onclick="|confirmRole(${u.id}, '${u.role}', '${u.email}')|"
+                                    th:if="${u.role != 'ADMIN'}">
+                                <i class="bi bi-arrow-repeat"></i>
+                            </button>
+                            <!-- Reset mật khẩu -->
+                            <button class="action-btn btn-reset" title="Reset mật khẩu về '1'"
+                                    th:onclick="|confirmReset(${u.id}, '${u.email}')|">
+                                <i class="bi bi-key"></i>
+                            </button>
+                            <!-- Xóa (không cho xóa ADMIN) -->
+                            <button class="action-btn btn-delete" title="Xóa tài khoản"
+                                    th:if="${u.role != 'ADMIN'}"
+                                    th:onclick="|confirmDelete(${u.id}, '${u.email}')|">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Pagination -->
+        <div th:if="${totalPages > 1}"
+             class="d-flex justify-content-center align-items-center gap-2 p-3 border-top">
+            <a th:href="@{/admin/users(page=${currentPage-1}, keyword=${keyword}, role=${currentRole})}"
+               th:classappend="${currentPage == 0} ? 'disabled pe-none opacity-50'"
+               class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+                <i class="bi bi-chevron-left"></i>
+            </a>
+            <span th:each="i : ${#numbers.sequence(0, totalPages-1)}">
+                <a th:href="@{/admin/users(page=${i}, keyword=${keyword}, role=${currentRole})}"
+                   th:text="${i+1}"
+                   th:classappend="${currentPage == i} ? 'btn-danger text-white' : 'btn-outline-secondary'"
+                   class="btn btn-sm rounded-pill px-3">1</a>
+            </span>
+            <a th:href="@{/admin/users(page=${currentPage+1}, keyword=${keyword}, role=${currentRole})}"
+               th:classappend="${currentPage == totalPages-1} ? 'disabled pe-none opacity-50'"
+               class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+                <i class="bi bi-chevron-right"></i>
+            </a>
+        </div>
+    </div>
+
+</div>
+
+<!-- Toast -->
+<div id="adminToast">
+    <i class="bi bi-check-circle-fill"></i>
+    <span id="toastMsg">OK</span>
+</div>
+
+<!-- Confirm Modal -->
+<div class="confirm-modal-overlay" id="confirmOverlay">
+    <div class="confirm-modal">
+        <div style="font-size:2rem; text-align:center; margin-bottom:12px;" id="confirmIcon">⚠️</div>
+        <h6 id="confirmTitle" style="text-align:center;">Xác nhận</h6>
+        <p  id="confirmDesc"  style="text-align:center;">Bạn có chắc không?</p>
+        <div class="d-flex gap-2 justify-content-center mt-3">
+            <button onclick="closeConfirm()" class="btn btn-outline-secondary px-4">Hủy</button>
+            <button id="confirmOkBtn" class="btn btn-danger px-4">Xác nhận</button>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="scripts">
+<script>
+const CSRF  = document.querySelector('meta[name="_csrf"]')?.content ?? '';
+const CSRFH = document.querySelector('meta[name="_csrf_header"]')?.content ?? 'X-CSRF-TOKEN';
+let _confirmCallback = null;
+
+// ===== TOAST =====
+function showToast(msg, type = 'success') {
+    const t = document.getElementById('adminToast');
+    document.getElementById('toastMsg').textContent = msg;
+    t.className = type === 'error' ? 'error' : '';
+    t.style.borderLeftColor = type === 'error' ? '#dc3545' : '#22c55e';
+    t.style.display = 'flex';
+    clearTimeout(window._tt);
+    window._tt = setTimeout(() => t.style.display = 'none', 3500);
+}
+
+// ===== CONFIRM MODAL =====
+function showConfirm(icon, title, desc, btnText, btnClass, callback) {
+    document.getElementById('confirmIcon').textContent  = icon;
+    document.getElementById('confirmTitle').textContent = title;
+    document.getElementById('confirmDesc').textContent  = desc;
+    const btn = document.getElementById('confirmOkBtn');
+    btn.textContent  = btnText;
+    btn.className    = 'btn px-4 ' + btnClass;
+    _confirmCallback = callback;
+    document.getElementById('confirmOverlay').classList.add('show');
+}
+function closeConfirm() {
+    document.getElementById('confirmOverlay').classList.remove('show');
+    _confirmCallback = null;
+}
+document.getElementById('confirmOkBtn').onclick = () => {
+    if (_confirmCallback) { _confirmCallback(); closeConfirm(); }
+};
+
+// ===== ĐỔI ROLE =====
+function confirmRole(userId, currentRole, email) {
+    const newRole  = currentRole === 'ADMIN' ? 'USER' : 'ADMIN';
+    const newLabel = newRole === 'ADMIN' ? '🛡️ ADMIN' : '👤 USER';
+    showConfirm('🔄', 'Đổi quyền tài khoản',
+        `Đổi "${email}" sang ${newLabel}?`,
+        'Đổi role', 'btn-warning',
+        () => changeRole(userId, newRole)
+    );
+}
+function changeRole(userId, newRole) {
+    const body = new URLSearchParams({ role: newRole });
+    fetch(`/admin/users/${userId}/role`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded', [CSRFH]: CSRF },
+        body: body
+    })
+    .then(r => r.json())
+    .then(d => {
+        showToast(d.message, d.success ? 'success' : 'error');
+        if (d.success) setTimeout(() => location.reload(), 1200);
+    });
+}
+
+// ===== RESET MẬT KHẨU =====
+function confirmReset(userId, email) {
+    showConfirm('🔐', 'Reset mật khẩu',
+        `Reset mật khẩu của "${email}" về "1"?`,
+        'Reset ngay', 'btn-purple',
+        () => resetPassword(userId)
+    );
+}
+function resetPassword(userId) {
+    fetch(`/admin/users/${userId}/reset-password`, {
+        method: 'POST',
+        headers: { [CSRFH]: CSRF }
+    })
+    .then(r => r.json())
+    .then(d => showToast(d.message, d.success ? 'success' : 'error'));
+}
+
+// ===== XÓA =====
+function confirmDelete(userId, email) {
+    showConfirm('🗑️', 'Xóa tài khoản',
+        `Xóa vĩnh viễn tài khoản "${email}"? Hành động này không thể hoàn tác!`,
+        'Xóa vĩnh viễn', 'btn-danger',
+        () => deleteUser(userId)
+    );
+}
+function deleteUser(userId) {
+    fetch(`/admin/users/${userId}/delete`, {
+        method: 'POST',
+        headers: { [CSRFH]: CSRF }
+    })
+    .then(r => r.json())
+    .then(d => {
+        showToast(d.message, d.success ? 'success' : 'error');
+        if (d.success) setTimeout(() => location.reload(), 1200);
+    });
+}
+</script>
+</th:block>
+</body>
+</html>
