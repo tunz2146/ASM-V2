@@ -13,15 +13,19 @@ import java.util.List;
 @Service
 public class DonHangService {
 
-    @Autowired private DonHangRepository donHangRepository;
-    @Autowired private GioHangRepository gioHangRepository;
-    @Autowired private NguoiDungRepository nguoiDungRepository;
+    @Autowired private DonHangRepository     donHangRepository;
+    @Autowired private GioHangRepository     gioHangRepository;
+    @Autowired private NguoiDungRepository   nguoiDungRepository;
 
     // ============================================================
-    // USER: Tạo đơn hàng từ giỏ hàng
+    // USER: Tạo đơn hàng từ giỏ hàng (CÓ HỖ TRỢ MÃ GIẢM GIÁ)
     // ============================================================
     @Transactional
-    public DonHang createOrder(String email, String thongTinGiaoHang, String donViVanChuyen) {
+    public DonHang createOrder(String email,
+                               String thongTinGiaoHang,
+                               String donViVanChuyen,
+                               Long discountAmount,     // ← Thêm mới
+                               String couponCode) {     // ← Thêm mới
 
         NguoiDung user = nguoiDungRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -29,18 +33,25 @@ public class DonHangService {
         List<GioHang> cartItems = gioHangRepository.findByNguoiDung_Id(user.getId());
         if (cartItems.isEmpty()) throw new RuntimeException("Giỏ hàng trống!");
 
-        long tongTien = cartItems.stream().mapToLong(GioHang::getThanhTien).sum();
-        long phiVC    = tongTien >= 1_000_000 ? 0L : 30_000L;
+        long subtotal = cartItems.stream().mapToLong(GioHang::getThanhTien).sum();
+        long phiVC    = subtotal >= 1_000_000 ? 0L : 30_000L;
+
+        // ✅ Đảm bảo discount không âm và không vượt quá subtotal
+        if (discountAmount == null) discountAmount = 0L;
+        discountAmount = Math.min(discountAmount, subtotal); // Không giảm quá subtotal
+
+        long tongTien = Math.max(0, subtotal - discountAmount + phiVC);
 
         DonHang donHang = new DonHang();
         donHang.setNguoiDung(user);
         donHang.setNgayDat(LocalDate.now());
         donHang.setTinhTrang("CHO_XAC_NHAN");
-        donHang.setTongTien(tongTien + phiVC);
+        donHang.setTongTien(tongTien);
         donHang.setThongTinGiaoHang(thongTinGiaoHang);
         donHang.setDonViVanChuyen(donViVanChuyen != null ? donViVanChuyen : "GHN");
         donHang.setPhiVanChuyen(phiVC);
-        donHang.setKhuyenMai(0L);
+        donHang.setKhuyenMai(discountAmount);   // ✅ Lưu số tiền giảm vào DB
+        // Nếu entity DonHang có field maCoupon thì thêm: donHang.setMaCoupon(couponCode);
 
         DonHang saved = donHangRepository.save(donHang);
 
@@ -53,9 +64,18 @@ public class DonHangService {
             ct.setKhuyenMai(0);
             saved.getChiTietDonHangs().add(ct);
         }
+
         donHangRepository.save(saved);
         gioHangRepository.deleteByNguoiDung_Id(user.getId());
         return saved;
+    }
+
+    // ============================================================
+    // Overload giữ tương thích với code cũ (không có coupon)
+    // ============================================================
+    @Transactional
+    public DonHang createOrder(String email, String thongTinGiaoHang, String donViVanChuyen) {
+        return createOrder(email, thongTinGiaoHang, donViVanChuyen, 0L, null);
     }
 
     // ============================================================
@@ -103,24 +123,14 @@ public class DonHangService {
     // ============================================================
     // ADMIN: Thống kê
     // ============================================================
-    public long countByStatus(String status) {
-        return donHangRepository.countByTinhTrang(status);
-    }
+    public long countByStatus(String status) { return donHangRepository.countByTinhTrang(status); }
+    public Long getTotalRevenue()            { return donHangRepository.sumDoanhThu(); }
+    public long countAll()                   { return donHangRepository.count(); }
 
-    public Long getTotalRevenue() {
-        return donHangRepository.sumDoanhThu();
-    }
-
-    public long countAll() {
-        return donHangRepository.count();
-    }
-
-    // ✅ THÊM MỚI: Đếm đơn hàng theo userId (dùng cho trang chi tiết khách hàng)
     public long countByUserId(Long userId) {
         return donHangRepository.findByNguoiDung_IdOrderByNgayDatDesc(userId).size();
     }
 
-    // ✅ THÊM MỚI: Lấy danh sách đơn hàng theo userId
     public List<DonHang> getOrdersByUserId(Long userId) {
         return donHangRepository.findByNguoiDung_IdOrderByNgayDatDesc(userId);
     }

@@ -6,6 +6,7 @@ import com.gamingshop.repository.NguoiDungRepository;
 import com.gamingshop.service.DonHangService;
 import com.gamingshop.service.GioHangService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -19,35 +20,22 @@ import java.util.Map;
 @Controller
 public class CheckoutController {
 
-    @Autowired
-    private GioHangService gioHangService;
-
-    @Autowired
-    private DonHangService donHangService;
-
-    @Autowired
-    private NguoiDungRepository nguoiDungRepository;
+    @Autowired private GioHangService  gioHangService;
+    @Autowired private DonHangService  donHangService;
+    @Autowired private NguoiDungRepository nguoiDungRepository;
 
     // ===== TRANG CHECKOUT =====
     @GetMapping("/checkout")
-    public String checkoutPage(Model model, Authentication auth) {
+    public String checkoutPage(Model model, Authentication auth, HttpSession session) {
         String email = auth.getName();
-
-        // Lấy thông tin user
         NguoiDung user = nguoiDungRepository.findByEmail(email).orElse(null);
 
-        // Lấy đơn hàng gần nhất để điền thông tin sẵn
-        String lastAddress = null;
-        String lastPhone   = null;
-        String lastName    = null;
-        String lastCity    = null;
-        String lastDistrict = null;
-        String lastWard    = null;
-        String lastNote    = null;
+        // Điền sẵn thông tin từ đơn hàng cũ
+        String lastName = null, lastPhone = null, lastAddress = null;
+        String lastCity = null, lastDistrict = null, lastWard = null, lastNote = null;
 
         List<DonHang> prevOrders = donHangService.getOrdersByEmail(email);
         if (!prevOrders.isEmpty()) {
-            // Lấy đơn mới nhất (danh sách đã sort DESC)
             DonHang lastOrder = prevOrders.get(0);
             String json = lastOrder.getThongTinGiaoHang();
             if (json != null && !json.isEmpty()) {
@@ -64,33 +52,46 @@ public class CheckoutController {
                 } catch (Exception ignored) {}
             }
         }
-
-        // Nếu không có đơn cũ thì dùng thông tin profile
-        if (lastName  == null && user != null) lastName  = user.getTen();
+        // Nếu không có đơn cũ → dùng thông tin profile tên và sđt của user
+        if (lastName  == null && user != null) lastName  = user.getTen(); 
         if (lastPhone == null && user != null) lastPhone = user.getSoDienThoai();
 
-        model.addAttribute("cartItems",    gioHangService.getCartByEmail(email));
-        model.addAttribute("totalAmount",  gioHangService.getTotalAmount(email));
-        model.addAttribute("pageTitle",    "Thanh toán - Gaming Shop");
-        model.addAttribute("userEmail",    email);
-        model.addAttribute("prefillName",    lastName    != null ? lastName    : "");
-        model.addAttribute("prefillPhone",   lastPhone   != null ? lastPhone   : "");
-        model.addAttribute("prefillAddress", lastAddress != null ? lastAddress : "");
-        model.addAttribute("prefillCity",    lastCity    != null ? lastCity    : "");
-        model.addAttribute("prefillDistrict",lastDistrict!= null ? lastDistrict: "");
-        model.addAttribute("prefillWard",    lastWard    != null ? lastWard    : "");
-        model.addAttribute("prefillNote",    lastNote    != null ? lastNote    : "");
+        // ✅ Đọc coupon từ Session
+        String appliedCoupon  = (String) session.getAttribute("appliedCoupon");
+        Long   discountAmount = (Long)   session.getAttribute("discountAmount");
+        if (discountAmount == null) discountAmount = 0L;
+
+        long subtotal   = gioHangService.getTotalAmount(email);
+        long shipping   = subtotal >= 1_000_000 ? 0L : 30_000L;
+        long finalTotal = Math.max(0, subtotal - discountAmount + shipping);
+
+        model.addAttribute("cartItems",       gioHangService.getCartByEmail(email));
+        model.addAttribute("subtotal",        subtotal);
+        model.addAttribute("shippingFee",     shipping);
+        model.addAttribute("discountAmount",  discountAmount);
+        model.addAttribute("appliedCoupon",   appliedCoupon);
+        model.addAttribute("totalAmount",     finalTotal);   // ← Tổng đã trừ giảm giá
+        model.addAttribute("pageTitle",       "Thanh toán - Gaming Shop");
+        model.addAttribute("userEmail",       email);
+        model.addAttribute("prefillName",     lastName     != null ? lastName     : "");
+        model.addAttribute("prefillPhone",    lastPhone    != null ? lastPhone    : "");
+        model.addAttribute("prefillAddress",  lastAddress  != null ? lastAddress  : "");
+        model.addAttribute("prefillCity",     lastCity     != null ? lastCity     : "");
+        model.addAttribute("prefillDistrict", lastDistrict != null ? lastDistrict : "");
+        model.addAttribute("prefillWard",     lastWard     != null ? lastWard     : "");
+        model.addAttribute("prefillNote",     lastNote     != null ? lastNote     : "");
         model.addAttribute("hasPreviousOrder", !prevOrders.isEmpty());
 
         return "checkout";
     }
 
-    // ===== API: LƯU ĐƠN HÀNG VÀO DATABASE =====
+    // ===== API: LƯU ĐƠN HÀNG =====
     @PostMapping("/checkout/place-order")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> placeOrder(
             @RequestBody Map<String, String> body,
-            Authentication auth) {
+            Authentication auth,
+            HttpSession session) {
 
         try {
             String email    = auth.getName();
@@ -103,22 +104,19 @@ public class CheckoutController {
             String note     = body.get("note");
 
             // Validate
-            if (fullName == null || fullName.trim().isEmpty()) {
-                return ResponseEntity.badRequest().body(Map.of(
-                    "success", false, "message", "Vui lòng nhập họ và tên"));
-            }
-            if (phone == null || phone.trim().isEmpty()) {
-                return ResponseEntity.badRequest().body(Map.of(
-                    "success", false, "message", "Vui lòng nhập số điện thoại"));
-            }
-            if (!phone.trim().matches("^(0|\\+84)[0-9]{8,10}$")) {
-                return ResponseEntity.badRequest().body(Map.of(
-                    "success", false, "message", "Số điện thoại không hợp lệ (VD: 0794612606)"));
-            }
-            if (address == null || address.trim().isEmpty()) {
-                return ResponseEntity.badRequest().body(Map.of(
-                    "success", false, "message", "Vui lòng nhập địa chỉ giao hàng"));
-            }
+            if (fullName == null || fullName.trim().isEmpty())
+                return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Vui lòng nhập họ và tên"));
+            if (phone == null || phone.trim().isEmpty())
+                return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Vui lòng nhập số điện thoại"));
+            if (!phone.trim().matches("^(0|\\+84)[0-9]{8,10}$"))
+                return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Số điện thoại không hợp lệ (VD: 0794612606)"));
+            if (address == null || address.trim().isEmpty())
+                return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Vui lòng nhập địa chỉ giao hàng"));
+
+            // ✅ Đọc discount từ Session
+            Long discountAmount = (Long) session.getAttribute("discountAmount");
+            String appliedCoupon = (String) session.getAttribute("appliedCoupon");
+            if (discountAmount == null) discountAmount = 0L;
 
             // Build JSON thông tin giao hàng
             ObjectMapper mapper = new ObjectMapper();
@@ -132,8 +130,14 @@ public class CheckoutController {
                 "note",     note     != null ? note.trim()     : ""
             ));
 
-            // Tạo đơn hàng trong DB
-            DonHang donHang = donHangService.createOrder(email, thongTinGiaoHang, "GHN");
+            // ✅ Tạo đơn hàng có trừ giảm giá
+            DonHang donHang = donHangService.createOrder(
+                email, thongTinGiaoHang, "GHN", discountAmount, appliedCoupon
+            );
+
+            // ✅ Xóa coupon khỏi Session sau khi đặt hàng thành công
+            session.removeAttribute("appliedCoupon");
+            session.removeAttribute("discountAmount");
 
             return ResponseEntity.ok(Map.of(
                 "success",   true,
@@ -145,15 +149,11 @@ public class CheckoutController {
 
         } catch (RuntimeException e) {
             String msg = e.getMessage();
-            if (msg != null && msg.contains("trống")) {
-                return ResponseEntity.badRequest().body(Map.of(
-                    "success", false, "message", "Giỏ hàng của bạn đang trống!"));
-            }
-            return ResponseEntity.internalServerError().body(Map.of(
-                "success", false, "message", "Lỗi hệ thống: " + msg));
+            if (msg != null && msg.contains("trống"))
+                return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Giỏ hàng của bạn đang trống!"));
+            return ResponseEntity.internalServerError().body(Map.of("success", false, "message", "Lỗi hệ thống: " + msg));
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(Map.of(
-                "success", false, "message", "Đã xảy ra lỗi, vui lòng thử lại!"));
+            return ResponseEntity.internalServerError().body(Map.of("success", false, "message", "Đã xảy ra lỗi, vui lòng thử lại!"));
         }
     }
 }

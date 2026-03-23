@@ -51,7 +51,7 @@ public class SanPham {
     }
 
     // ==========================================
-    // 👇 GETTER & SETTER THỦ CÔNG (ĐẦY ĐỦ)
+    // 👇 GETTER & SETTER THỦ CÔNG (ĐẦY ĐỦ) 
     // ==========================================
 
     public Long getId() { return id; }

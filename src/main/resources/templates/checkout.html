@@ -444,25 +444,38 @@
 
                         <div class="border-top pt-3 mt-2">
                             <div class="sum-row">
-                                <span class="lbl">Tạm tính</span>
-                                <span class="val" id="coSub"
-                                      th:text="${#numbers.formatInteger(totalAmount,0,'COMMA')+'₫'}">0₫</span>
-                            </div>
+                            <span class="lbl">Tạm tính</span>
+                            <span class="val" id="coSub"
+                            th:text="${#numbers.formatInteger(subtotal, 0, 'COMMA') + '₫'}">0₫</span>
+                        </div>
+
                             <div class="sum-row">
-                                <span class="lbl">Phí vận chuyển</span>
-                                <span class="val text-success" id="coShip">
-                                    <span th:if="${totalAmount >= 1000000}">Miễn phí</span>
-                                    <span th:unless="${totalAmount >= 1000000}">30.000₫</span>
+                            <span class="lbl">Phí vận chuyển</span>
+                            <span class="val text-success" id="coShip">
+                            <span th:if="${shippingFee == 0}">Miễn phí</span>
+                            <span th:unless="${shippingFee == 0}"
+                             th:text="${#numbers.formatInteger(shippingFee, 0, 'COMMA') + '₫'}">30.000₫</span>
+                            </span>
+                        </div>
+
+                        <div class="sum-row" th:if="${discountAmount != null and discountAmount > 0}"
+                            style="color: #22c55e;">
+                                <span class="lbl">
+                                    <i class="bi bi-tag-fill me-1"></i>
+                                    Mã giảm giá
+                                <span th:if="${appliedCoupon != null}"
+                                style="font-size:0.75rem;background:#dcfce7;color:#166534;
+                                padding:2px 8px;border-radius:20px;margin-left:4px;"
+                                th:text="${appliedCoupon}">CODE</span>
                                 </span>
-                            </div>
+                                <span class="val fw-bold"
+                                th:text="${'-' + #numbers.formatInteger(discountAmount, 0, 'COMMA') + '₫'}">-0₫</span>
                         </div>
 
                         <div class="grand-total">
                             <span class="lbl">Tổng thanh toán</span>
                             <span class="val" id="coTotal"
-                                  th:text="${#numbers.formatInteger(totalAmount + (totalAmount >= 1000000 ? 0 : 30000), 0,'COMMA')+'₫'}">
-                                0₫
-                            </span>
+                                th:text="${#numbers.formatInteger(totalAmount, 0, 'COMMA') + '₫'}">0₫</span>
                         </div>
 
                     </div>

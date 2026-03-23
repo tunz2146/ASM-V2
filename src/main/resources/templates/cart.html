@@ -972,21 +972,10 @@
             });
         }
 
-        // ===== ÁP DỤNG COUPON (UI demo) =====
+        // ===== ÁP DỤNG COUPON - GỌI API SERVER (LƯU SESSION) =====
         function applyCoupon() {
-          const code = document
-            .getElementById("couponInput")
-            .value.trim()
-            .toUpperCase();
+          const code = document.getElementById("couponInput").value.trim();
           const msgEl = document.getElementById("couponMsg");
-          const discRow = document.getElementById("discountRow");
-          const discEl = document.getElementById("discountDisplay");
-
-          const coupons = {
-            GAMING10: { type: "percent", value: 10, min: 500000 },
-            MOUSE20: { type: "percent", value: 20, min: 800000 },
-            FREE_SHIP: { type: "ship", value: 30000, min: 0 },
-          };
 
           if (!code) {
             msgEl.innerHTML =
@@ -994,43 +983,75 @@
             return;
           }
 
-          if (coupons[code]) {
-            const c = coupons[code];
-            // Lấy subtotal hiện tại (parse từ text)
-            const subtotalText =
-              document.getElementById("subtotalDisplay").textContent;
-            const subtotal = parseInt(subtotalText.replace(/[^\d]/g, ""));
+          msgEl.innerHTML =
+            '<span class="text-muted"><i class="bi bi-hourglass-split me-1"></i>Đang kiểm tra...</span>';
 
-            if (subtotal < c.min) {
-              msgEl.innerHTML = `<span class="text-danger">Đơn hàng tối thiểu ${formatVND(c.min)} để dùng mã này!</span>`;
-              return;
-            }
+          fetch("/cart/apply-coupon", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+              [csrfHeader]: csrfToken,
+            },
+            body: `code=${encodeURIComponent(code)}`,
+          })
+            .then((r) => r.json())
+            .then((data) => {
+              const discRow = document.getElementById("discountRow");
+              const discEl = document.getElementById("discountDisplay");
 
-            let discountAmount = 0;
-            if (c.type === "percent")
-              discountAmount = Math.floor((subtotal * c.value) / 100);
-            else if (c.type === "ship") discountAmount = c.value;
+              if (data.success) {
+                if (discRow) discRow.style.display = "flex";
+                if (discEl)
+                  discEl.textContent = "-" + formatVND(data.discountAmount);
 
-            discRow.style.display = "flex";
-            discEl.textContent = "-" + formatVND(discountAmount);
-            msgEl.innerHTML = `<span class="text-success"><i class="bi bi-check-circle me-1"></i>Áp dụng mã thành công!</span>`;
+                if (data.finalTotal !== undefined) {
+                  const shipping = data.finalTotal >= 1000000 ? 0 : 30000;
+                  document.getElementById("totalDisplay").textContent =
+                    formatVND(data.finalTotal + shipping);
+                }
 
-            // Cập nhật tổng
-            const shipping = subtotal >= 1000000 ? 0 : 30000;
-            const newTotal = subtotal + shipping - discountAmount;
-            document.getElementById("totalDisplay").textContent = formatVND(
-              Math.max(0, newTotal),
-            );
-          } else {
-            msgEl.innerHTML =
-              '<span class="text-danger"><i class="bi bi-x-circle me-1"></i>Mã không hợp lệ hoặc đã hết hạn!</span>';
-            discRow.style.display = "none";
-          }
+                msgEl.innerHTML = `<span class="text-success"><i class="bi bi-check-circle me-1"></i>${data.message}</span>`;
+
+                // Hiện nút hủy mã
+                let removeBtn = document.getElementById("removeCouponBtn");
+                if (!removeBtn) {
+                  removeBtn = document.createElement("button");
+                  removeBtn.id = "removeCouponBtn";
+                  removeBtn.className = "btn btn-sm btn-outline-secondary mt-1";
+                  removeBtn.innerHTML = '<i class="bi bi-x me-1"></i>Hủy mã';
+                  removeBtn.onclick = removeCoupon;
+                  msgEl.parentNode.appendChild(removeBtn);
+                }
+              } else {
+                if (discRow) discRow.style.display = "none";
+                msgEl.innerHTML = `<span class="text-danger"><i class="bi bi-x-circle me-1"></i>${data.message}</span>`;
+                const removeBtn = document.getElementById("removeCouponBtn");
+                if (removeBtn) removeBtn.remove();
+                location.reload();
+              }
+            })
+            .catch(() => {
+              msgEl.innerHTML =
+                '<span class="text-danger">Lỗi kết nối, vui lòng thử lại!</span>';
+            });
+        }
+
+        // ===== HỦY MÃ COUPON =====
+        function removeCoupon() {
+          fetch("/cart/remove-coupon", {
+            method: "POST",
+            headers: { [csrfHeader]: csrfToken },
+          })
+            .then((r) => r.json())
+            .then((data) => {
+              if (data.success) location.reload();
+            });
         }
 
         // ===== TIẾN HÀNH THANH TOÁN =====
-        function proceedCheckout() { 
-            window.location.href = '/checkout'; 
+        // Coupon đã lưu trong Session, không cần truyền thêm gì
+        function proceedCheckout() {
+          window.location.href = "/checkout";
         }
 
         // Enter để áp coupon
